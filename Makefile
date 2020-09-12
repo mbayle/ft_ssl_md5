@@ -3,72 +3,51 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: geargenc <geargenc@student.42.fr>          +#+  +:+       +#+         #
+#    By: lmontagn <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2019/08/13 18:51:58 by mabayle           #+#    #+#              #
-#    Updated: 2020/04/29 10:20:25 by geargenc         ###   ########.fr        #
+#    Created: 2020/01/18 04:08:14 by lmontagn          #+#    #+#              #
+#    Updated: 2020/03/06 03:52:34 by lmontagn         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		:=	ft_ssl
+NAME = ft_ssl
 
-CC			:=	clang
-LINKER		:=	clang -o 
+COMPILER = clang
+FLAGS = -Wall -Wextra -Werror
+OFLAGS = -c -I includes
 
-DEBUG		:=	0
+SRCS_PATH		= srcs
+OBJS_PATH		= objs
 
-LIBFT		:=	libft/libft.a
+SRCS	=	main.c \
+			misc.c
 
-INCLUDES	:=	./includes
+OBJS		= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS))
 
-INCS		=	./includes/get_next_line.h \
+INCLUDES =	includes
 
-#libft
-INCLUDES	:=	$(INCLUDES) -I$(dir $(LIBFT))includes
-LDFLAGS		:=	-L$(dir $(LIBFT)) -lft
+all : $(NAME)
 
-CFLAGS		:=	-Wall -Wextra -Werror -g3 -I$(INCLUDES)
-ifeq ($(DEBUG), 1)
-	CFLAGS	:=	$(CFLAGS) -ggdb -fno-omit-frame-pointer
-endif
+$(OBJS_PATH)/%.o : $(SRCS_PATH)/%.c
+	@mkdir -p $(OBJS_PATH)
+	@$(COMPILER) $(FLAGS) $(OFLAGS) -o $@ $<
 
-SRC_PATH	:=	./src/
-OBJ_PATH	:=	./obj/
+$(NAME) : $(OBJS)
+	@echo -e "Objects creation for $(NAME)...\t\t[ DONE ]"
+	@/bin/echo -n "Compiling $(NAME) binary..."
+	@$(COMPILER) -o $(NAME) $(OBJS)
+	@echo -e "\t\t[ DONE ]"
+	@echo -e "\n'$(NAME)' binary executable successfully created.\n"
 
-SRC		:=	main.c \
+clean :
+	@rm -rf $(OBJS)
+	@echo "Object files removed"
 
-OBJ		:=	$(addprefix $(OBJ_PATH), $(SRC:.c=.o))
-SRC		:=	$(addprefix $(SRC_PATH), $(SRC))
-
-all:
-	@make $(NAME)
-
-$(NAME):  $(LIBFT) $(OBJ)
-	@$(LINKER) $(NAME) $(OBJ) $(LDFLAGS) -ltermcap
-	@echo ""
-	@echo "\033[0;32mft_ssl build done\033[0m"
-	@echo ""
-
-$(LIBFT):	$(dir $(LIBFT))Makefile
-	@make -j4 -C $(dir $(LIBFT))
-
-$(OBJ_PATH)%.o: $(SRC_PATH)%.c $(INCS)
-	@echo "\033[0;32m[✓]\033[0m\033[0;33m [ft_ssl] Compiling : \033[0m" $<
-	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -c $< -o $@
-
-clean:
-	@rm -rf $(OBJ_PATH)
-	@echo "\033[0;32m[✓]\033[0m\033[0;33m [ft_ssl] Deleted all .o\033[0m"
-	@rm -rf ft_ssl.dSYM
-
-fclean:
-	@make -j4 -C libft/ fclean
+fclean : clean
 	@rm -f $(NAME)
-	@rm -rf $(OBJ_PATH)
-	@echo "\033[0;32m[✓]\033[0m\033[0;33m [ft_ssl] Deleted all .o\033[0m"
-	@echo "\033[0;32m[✓]\033[0m\033[0;33m [ft_ssl] Deleted ft_ssl\033[0m"
+	@echo "Binary files removed."
 
-re: fclean all
+re : fclean all
 
-.PHONY:	all clean fclean re
+.PHONY : fclean re clean all
+
