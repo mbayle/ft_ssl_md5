@@ -20,6 +20,7 @@ SRCS_PATH		= srcs
 OBJS_PATH		= objs
 
 SRCS	=	main.c \
+			hash.c \
 			misc.c
 
 OBJS		= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS))

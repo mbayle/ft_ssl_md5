@@ -1,7 +1,7 @@
 #include "ft_ssl.h"
 #include "ft_md5.h"
 
-t_uint32	*calctable(unsigned *k)
+t_uint32	*calctable(t_uint32 *k)
 {
 	double	s;
 	double	pwr;
@@ -13,10 +13,10 @@ t_uint32	*calctable(unsigned *k)
 	while (i < 64)
 	{
 		s = fabs(sin(1.0 + i));
-		k[i] = (unsigned)(s * pwr);
+		k[i] = (t_uint32)(s * pwr);
 		i++;
 	}
-	return k;
+	return (k);
 }
 
 t_md5_ctx	*context_init(void)
