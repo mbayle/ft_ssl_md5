@@ -16,8 +16,10 @@
 ** Defining cipher values
 */
 
-# define MD5	1
-# define SHA256	2
+enum		e_cipher {
+	MD5,
+	SHA256,
+};
 
 /*
 ** Defining error codes
