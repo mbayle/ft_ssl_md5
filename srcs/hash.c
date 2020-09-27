@@ -34,7 +34,6 @@ static char         read_iterator(hash_fn hash, size_t read_size, int fd)
     ft_bzero(buf, 65);
     while((len = read(fd, buf, read_size)) > 0)
     {
-        printf("test: %s - ", buf);
         hash(buf, len);
         ft_bzero(buf, 65);
     }

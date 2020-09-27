@@ -52,12 +52,12 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
     if (!(msg2 = malloc(65)))
         return (NULL);
     ft_bzero(msg2, 65);
-    ft_memcpy(msg2, msg, len - 1);
-
-    if (len < 64)
-        msg2 = md5_pad_msg(msg2, len);
+    ft_memcpy(msg2, msg, len);
 
     total_len += len;
+
+    if (len < 64)
+        msg2 = md5_pad_msg(msg2, total_len);
 
     printf("handling \"%s\"\n", msg2);
     printf("current context: %#x, %#x, %#x, %#x\n\n", context->state[0], context->state[1], context->state[2], context->state[3]);
@@ -79,7 +79,9 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
         }
     }
     for (p = 0; p<4; p++)
+	{
         context->state[p] += abcd[p];
+	}
 
 	return context->state;
 }
@@ -109,6 +111,7 @@ char	*md5(const char *msg, t_uint32 len)
             i++;
         }
     }
+	printf("HASH: %s\n", hash);
 	return (hash);
 }
 
