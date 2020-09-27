@@ -17,17 +17,28 @@ FLAGS = -Wall -Wextra -Werror
 OFLAGS = -c -I includes
 
 SRCS_PATH		= srcs
+SRCS_MD5_PATH	= srcs/md5
 OBJS_PATH		= objs
 
-SRCS	=	main.c \
-			hash.c \
-			misc.c
+SRCS		=	main.c \
+				hash.c \
+				misc.c \
+				help.c
+
+SRCS_MD5	=	md5.c \
+				operations.c \
+				init.c
 
 OBJS		= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS))
+OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_MD5))
 
 INCLUDES =	includes
 
 all : $(NAME)
+
+$(OBJS_PATH)/%.o : $(SRCS_MD5_PATH)/%.c
+	@mkdir -p $(OBJS_PATH)
+	@$(COMPILER) $(FLAGS) $(OFLAGS) -o $@ $<
 
 $(OBJS_PATH)/%.o : $(SRCS_PATH)/%.c
 	@mkdir -p $(OBJS_PATH)

@@ -59,6 +59,7 @@ typedef t_uint32 (*digest_fn)(t_uint32 a[]);
 /*
 ** Function prototypes
 */
+char  *md5(const char *msg, t_uint32 len);
 
 /* Initialization */
 t_uint32	*calctable(unsigned *k);

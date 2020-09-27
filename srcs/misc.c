@@ -34,7 +34,31 @@ void	ft_bzero(void *s, size_t n)
 		*s1++ = 0;
 }
 
-void	print_usage(void)
+char	*ft_strcat(char *s1, const char *s2)
 {
-	write(1, "usage: ft_ssl [cipher] [-pqro] [-s string] [files ...]\n", 55);
+	int c;
+	int i;
+
+	c = 0;
+	i = 0;
+	while (s1[i])
+		i++;
+	while (s2[c])
+		s1[i++] = s2[c++];
+	s1[i] = '\0';
+	return (s1);
+}
+
+void	*ft_memcpy(void *dst, const void *src, size_t n)
+{
+	int				i;
+	unsigned char	*dest;
+	unsigned char	*srce;
+
+	i = 0;
+	dest = (unsigned char *)dst;
+	srce = (unsigned char *)src;
+	while (n-- > 0)
+		dest[i++] = *srce++;
+	return ((void *)dest);
 }

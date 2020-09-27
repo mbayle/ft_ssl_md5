@@ -1,6 +1,7 @@
 #include "ft_ssl.h"
 #include "ft_md5.h"
 
+#include <math.h>
 t_uint32	*calctable(t_uint32 *k)
 {
 	double	s;
