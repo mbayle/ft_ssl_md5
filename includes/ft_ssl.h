@@ -68,6 +68,11 @@ char    	*ft_strcat(char *s1, const char *s2);
 void	    *ft_memcpy(void *dst, const void *src, size_t n);
 
 /*
+** display functions
+*/
+void    display_hash(char *hash, const t_opt options, const t_cipher cipher, char *args);
+
+/*
 ** help.c function
 */
 void		print_usage(void);

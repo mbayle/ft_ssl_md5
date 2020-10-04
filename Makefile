@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lmontagn <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: admin <admin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/18 04:08:14 by lmontagn          #+#    #+#              #
-#    Updated: 2020/03/06 03:52:34 by lmontagn         ###   ########.fr        #
+#    Updated: 2020/10/04 18:00:06 by admin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_ssl
 
 COMPILER = clang
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -g3
 OFLAGS = -c -I includes
 
 SRCS_PATH		= srcs
@@ -23,6 +23,7 @@ OBJS_PATH		= objs
 SRCS		=	main.c \
 				hash.c \
 				misc.c \
+				display.c \
 				help.c
 
 SRCS_MD5	=	md5.c \

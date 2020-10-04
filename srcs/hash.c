@@ -24,21 +24,23 @@ static size_t     *init_sizes_tab(void)
 }
 
 #include <stdio.h>
-static char         read_iterator(hash_fn hash, size_t read_size, int fd)
+static char         *read_iterator(hash_fn hash, size_t read_size, int fd)
 {
-    char        *buf;
     t_uint32    len;
+    char        *buf;
+    char        *result;
     
+    result = NULL;
     if (!(buf = malloc(read_size + 1)))
-        return (ERR_NO_MEM);
+        return (NULL);
     ft_bzero(buf, 65);
     while((len = read(fd, buf, read_size)) > 0)
     {
-        hash(buf, len);
+        result = hash(buf, len);
         ft_bzero(buf, 65);
     }
     free(buf);
-    return (SUCCESS);
+    return (result);
 }
 
 char                hash_message(const t_cipher cipher, const t_opt options, char **args, int count)
@@ -47,10 +49,10 @@ char                hash_message(const t_cipher cipher, const t_opt options, cha
     static size_t       *sizes_tab = NULL;
     int                 fd;
     int                 i;
+    char                *result;
 
     fd = 0;
     i = 0;
-    (void)options;
     if (func_tab == NULL)
         if (!(func_tab = init_func_tab()))
             return (ERR_NO_MEM);
@@ -58,7 +60,7 @@ char                hash_message(const t_cipher cipher, const t_opt options, cha
         if (!(sizes_tab = init_sizes_tab()))
             return (ERR_NO_MEM);
     if (count == 0)
-        read_iterator(func_tab[cipher], sizes_tab[cipher], 1);
+        result = read_iterator(func_tab[cipher], sizes_tab[cipher], 1);
     while (i < count)
     {
         if ((fd = open(args[i], O_RDONLY)) == -1)
@@ -67,10 +69,11 @@ char                hash_message(const t_cipher cipher, const t_opt options, cha
             free(func_tab);
             return (ERR_OPEN);
         }
-        read_iterator(func_tab[cipher], sizes_tab[cipher], fd);
+        result = read_iterator(func_tab[cipher], sizes_tab[cipher], fd);
         close(fd);
         i++;
     }
+    display_hash(result, options, cipher, args[0]);
     free(sizes_tab);
     free(func_tab);
     return (SUCCESS);
