@@ -15,25 +15,23 @@ static void		set_option(t_opt *options, char flag)
 		options->o = TRUE;
 }
 
-static t_opt	*get_options(char **args, int count)
+static t_opt	get_options(char **args, int count)
 {
 	t_uint32	i;
-	t_opt		*options;
+	t_opt		options;
 
 	i = 0;
-	if (!(options = malloc(sizeof(t_opt)))) // We should not allocate that
-		exit (ERR_NO_MEM);
-	ft_bzero(options, sizeof(t_opt));
+	ft_bzero(&options, sizeof(t_opt));
 	while (count--)
 	{
 		if (!(args[i][0] == '-'))
 			break ;
 		if (ft_strchr(OPT_CHARSET, args[i][1]) && !args[i][2])
-			set_option(options, args[i][1]);
+			set_option(&options, args[i][1]);
 		else
 		{
-			free(options);
-			return (NULL);
+			options.err = TRUE;
+			break ;
 		}
 		if (args[i][1] == 's')
 			break ;
@@ -68,7 +66,7 @@ static int     get_last_option(char **args, int n)
 int		main(int argc, char **argv)
 {
     t_cipher		cipher;
-	t_opt	    	*options;
+	t_opt	    	options;
     int             args_start;
 
 	if (argc == 1)
@@ -80,9 +78,9 @@ int		main(int argc, char **argv)
 	if (cipher == ERROR)
 		exit (ERR_BAD_CIPHER);
 	options = get_options(&argv[2], argc - 2);
-	if (options == NULL)
+	if (options.err == TRUE)
 		return (ERR_BAD_OPTION);
     args_start = get_last_option(argv, argc);
-    hash_message(cipher, *options, &argv[args_start], argc - args_start);
+    hash_message(cipher, options, &argv[args_start], argc - args_start);
 	return (SUCCESS);
 }

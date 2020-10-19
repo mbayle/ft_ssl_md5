@@ -2,17 +2,17 @@
 #include "ft_md5.h"
 
 #include <stdio.h>
-t_uint8		*md5_pad_msg(t_uint8 *msg, t_uint32 len)
+t_uint8		*md5_pad_msg(t_uint8 *msg, t_uint32 len, t_uint32 total_len)
 {
-    int q;
+    int		q;
+    u_md5	u;
 
-    printf("Setting the 0x80\n\n");
     msg[len] = (unsigned char)0x80;
     q = len + 1;
+	printf("q == %d\n", q);
     while (q < 64) 
         msg[q++] = 0;
-    u_md5 u;
-    u.word = 8 * len;
+    u.word = 8 * total_len;
     q -= 8;
     ft_memcpy(msg + q, &u.word, 4);
     return (msg);
@@ -55,9 +55,10 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
     ft_memcpy(msg2, msg, len);
 
     total_len += len;
+	printf("total_len == %u\n", total_len);
 
     if (len < 64)
-        msg2 = md5_pad_msg(msg2, total_len);
+        msg2 = md5_pad_msg(msg2, len, total_len);
     printf("current context: %#x, %#x, %#x, %#x\n\n", context->state[0], context->state[1], context->state[2], context->state[3]);
     ft_memcpy(block.str, msg2, 64);
     for (q = 0; q<4; q++)
@@ -129,15 +130,12 @@ char	*md5(const char *msg, t_uint32 len)
         while (i < 4)
         {
             block.word = digest[i];
-            // Replace next function
-            //sprintf(s, "%02x%02x%02x%02x", block.byte[0], block.byte[1], block.byte[2], block.byte[3]);
             ft_bzero(s, 8);
             block_to_str((char *)s, block);
             ft_strcat(hash, s);
             i++;
         }
     }
-	printf("HASH: %s\n", hash);
 	return (hash);
 }
 

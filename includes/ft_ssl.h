@@ -51,6 +51,7 @@ typedef struct	s_opt {
 	t_uint8		r : 1;
 	t_uint8		s : 1;
 	t_uint8		o : 1;
+	t_uint8		err : 1;
 }				t_opt;
 
 /*
