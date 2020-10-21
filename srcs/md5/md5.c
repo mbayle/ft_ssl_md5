@@ -9,12 +9,12 @@ t_uint8		*md5_pad_msg(t_uint8 *msg, t_uint32 len, t_uint32 total_len)
 
     msg[len] = (unsigned char)0x80;
     q = len + 1;
-	printf("q == %d\n", q);
     while (q < 64) 
         msg[q++] = 0;
     u.word = 8 * total_len;
     q -= 8;
-    ft_memcpy(msg + q, &u.word, 4);
+	if (len <= 55)
+		ft_memcpy(msg + q, &u.word, 4);
     return (msg);
 }
 
@@ -49,17 +49,16 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 	if (k == NULL)
 		k = calctable(k);				// initializing the static k table
 
-    if (!(msg2 = malloc(65)))
+    if (!(msg2 = malloc(65)))		// why malloc ?
         return (NULL);
     ft_bzero(msg2, 65);
     ft_memcpy(msg2, msg, len);
 
     total_len += len;
-	printf("total_len == %u\n", total_len);
 
     if (len < 64)
         msg2 = md5_pad_msg(msg2, len, total_len);
-    printf("current context: %#x, %#x, %#x, %#x\n\n", context->state[0], context->state[1], context->state[2], context->state[3]);
+
     ft_memcpy(block.str, msg2, 64);
     for (q = 0; q<4; q++)
         abcd[q] = context->state[q]; //abcd = h
@@ -82,6 +81,7 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
         context->state[p] += abcd[p];
 	}
 
+	free(msg2);
 	return context->state;
 }
 
@@ -127,6 +127,11 @@ char	*md5(const char *msg, t_uint32 len)
 	digest = hash_msg_md5(msg, len);
     if (len < 64)
     {
+		if (len > 55)
+		{
+			printf("Okay\n");
+			digest = hash_msg_md5(NULL, 0);
+		}
         while (i < 4)
         {
             block.word = digest[i];

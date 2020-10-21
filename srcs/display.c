@@ -36,7 +36,7 @@ void        display_hash(char *hash, const t_opt options, const t_cipher cipher,
     else if (options.r)
     {
        write(fd, hash, strlen(hash));
-       write(fd, " ", 1);
+       write(fd, " *", 2);
        write(fd, file_name, strlen(file_name));
        write(fd, "\n", 1);
     }

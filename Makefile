@@ -48,7 +48,7 @@ $(OBJS_PATH)/%.o : $(SRCS_PATH)/%.c
 $(NAME) : $(OBJS)
 	@echo -e "Objects creation for $(NAME)...\t\t[ DONE ]"
 	@/bin/echo -n "Compiling $(NAME) binary..."
-	@$(COMPILER) -o $(NAME) $(OBJS)
+	@$(COMPILER) -lm -o $(NAME) $(OBJS)
 	@echo -e "\t\t[ DONE ]"
 	@echo -e "\n'$(NAME)' binary executable successfully created.\n"
 
