@@ -119,13 +119,14 @@ char	*md5(const char *msg, t_uint32 len)
 	char		*hash;
 	char		s[9];
 
-	if (!(hash = malloc(33)))
-		return (NULL);
-	ft_bzero(hash, 33);
+	hash = NULL;
 	i = 0;
 	digest = hash_msg_md5(msg, len);
 	if (len < 64)
 	{
+		if (!(hash = malloc(33)))
+			return (NULL);
+		ft_bzero(hash, 33);
 		if (len > 55)
 			digest = hash_msg_md5(NULL, 0);
 		while (i < 4)

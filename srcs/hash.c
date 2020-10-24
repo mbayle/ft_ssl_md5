@@ -37,7 +37,7 @@ static char         *read_iterator(hash_fn hash, size_t read_size, int fd)
     while((len = read(fd, buf, read_size)) > 0)
     {
         result = hash(buf, len);
-        ft_bzero(buf, 65);
+		ft_bzero(buf, 65);
     }
     free(buf);
     return (result);
@@ -74,6 +74,7 @@ char                hash_message(const t_cipher cipher, const t_opt options, cha
         i++;
     }
     display_hash(result, options, cipher, args[0]);
+	free(result);
     free(sizes_tab);
     free(func_tab);
     return (SUCCESS);
