@@ -1,35 +1,41 @@
 #ifndef FT_MD5_H
 # define FT_MD5_H
 
-/* M table constant */
-#define M0	1
-#define M1	5
-#define	M2	3
-#define M3	7
+/* Context state constants */
+# define STATE1	0x67452301
+# define STATE2	0xEFCDAB89
+# define STATE3	0x98BADCFE
+# define STATE4	0x10325476
 
-/* O table constant */
-#define O0	0
-#define O1	1
-#define	O2	5
-#define O3	0
+/* M table constants */
+# define M0	1
+# define M1	5
+# define M2	3
+# define M3	7
 
-/* ROT CONSTANT */
-#define S11 7
-#define S12 12
-#define S13 17
-#define S14 22
-#define S21 5
-#define S22 9
-#define S23 14
-#define S24 20
-#define S31 4
-#define S32 11
-#define S33 16
-#define S34 23
-#define S41 6
-#define S42 10
-#define S43 15
-#define S44 21
+/* O table constants */
+# define O0	0
+# define O1	1
+# define O2	5
+# define O3	0
+
+/* ROT constants */
+# define S11 7
+# define S12 12
+# define S13 17
+# define S14 22
+# define S21 5
+# define S22 9
+# define S23 14
+# define S24 20
+# define S31 4
+# define S32 11
+# define S33 16
+# define S34 23
+# define S41 6
+# define S42 10
+# define S43 15
+# define S44 21
 
 typedef unsigned char	t_uint8;
 typedef unsigned short	t_uint16;
@@ -62,8 +68,9 @@ typedef t_uint32 (*digest_fn)(t_uint32 a[]);
 char  *md5(const char *msg, t_uint32 len);
 
 /* Initialization */
-t_uint32	*calctable(unsigned *k);
-t_md5_ctx	*context_init(void);
+t_uint32	*calctable_init(void);
+//t_md5_ctx	*context_init(void);
+void		context_init(t_uint32 *states);
 
 /* Operations */
 t_uint32	func0(t_uint32 v[]);

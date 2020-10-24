@@ -2,11 +2,12 @@
 #include "ft_md5.h"
 
 #include <math.h>
-t_uint32	*calctable(t_uint32 *k)
+t_uint32	*calctable_init(void)
 {
 	double	s;
 	double	pwr;
 	int		i;
+	t_uint32	*k;
 
 	i = 0;
 	k = malloc(sizeof(t_uint32) * 64);
@@ -20,16 +21,10 @@ t_uint32	*calctable(t_uint32 *k)
 	return (k);
 }
 
-t_md5_ctx	*context_init(void)
+void		context_init(t_uint32 *states)
 {
-	t_md5_ctx	*context;
-
-	context = malloc(sizeof(t_md5_ctx));
-	context->count[0] = 0;
-	context->count[1] = 0;
-	context->state[0] = 0x67452301;
-	context->state[1] = 0xEFCDAB89;
-	context->state[2] = 0x98BADCFE;
-	context->state[3] = 0x10325476;
-	return (context);
+	states[0] = 0x67452301;
+	states[1] = 0xEFCDAB89;
+	states[2] = 0x98BADCFE;
+	states[3] = 0x10325476;
 }
