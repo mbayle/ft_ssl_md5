@@ -33,7 +33,7 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 	u_block				block;
 
 	int                 q;
-	int                 p; // miscellaneddous counters
+	int                 p;
 
 	/* Don't know what the following are yet */
 	static short M[] = { M0, M1, M2, M3 };
@@ -57,14 +57,19 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 		md5_pad_msg((t_uint8 *)msg2, len, total_len);
 
 	ft_memcpy(block.str, msg2, 64);
-	for (q = 0; q<4; q++)
+	q = 0;
+	while (q < 4)
+	{
 		abcd[q] = context_states[q];
-
-	for (p = 0; p<4; p++)
+		q++;
+	}
+	p = 0;
+	while (p < 4)
 	{
 		m = M[p];
 		o = O[p];
-		for (q = 0; q<16; q++)
+		q = 0;
+		while (q < 16)
 		{
 			g = (m*q + o) % 16;
 			f = abcd[1] + rol32(abcd[0] + funcs[p](abcd) + k[q + 16 * p] + block.word[g], rots[p][q % 4]);
@@ -72,16 +77,18 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 			abcd[3] = abcd[2];
 			abcd[2] = abcd[1];
 			abcd[1] = f;
+			q++;
 		}
+		p++;
 	}
-	for (p = 0; p<4; p++)
-		context_states[p] += abcd[p];
-
-	if (len <= 54)
+	p = 0;
+	while (p < 4) 
 	{
-		printf("OUI\n");
-		free(k);
+		context_states[p] += abcd[p];
+		p++;
 	}
+	if (len <= 54)
+		free(k);
 	return context_states;
 }
 
