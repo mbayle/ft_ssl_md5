@@ -18,7 +18,7 @@ t_uint32	func2(t_uint32 v[])
 
 t_uint32	func3(t_uint32 v[])
 {
-	return v[2] ^ (v[1] |~ v[3]);
+	return v[2] ^ (v[1] | ~v[3]);
 }
 
 t_uint32	rol32(t_uint32 v, t_uint16 n)
