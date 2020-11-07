@@ -18,6 +18,7 @@ OFLAGS = -c -I includes
 
 SRCS_PATH		= srcs
 SRCS_MD5_PATH	= srcs/md5
+SRCS_SHA_PATH	= srcs/sha256
 OBJS_PATH		= objs
 
 SRCS		=	main.c \
@@ -27,17 +28,24 @@ SRCS		=	main.c \
 				help.c
 
 SRCS_MD5	=	md5.c \
-				operations.c \
+				operations_md5.c \
 				init.c
+
+SRCS_SHA	=	operations.c
 
 OBJS		= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS))
 OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_MD5))
+OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_SHA))
 
 INCLUDES =	includes
 
 all : $(NAME)
 
 $(OBJS_PATH)/%.o : $(SRCS_MD5_PATH)/%.c
+	@mkdir -p $(OBJS_PATH)
+	@$(COMPILER) $(FLAGS) $(OFLAGS) -o $@ $<
+
+$(OBJS_PATH)/%.o : $(SRCS_SHA_PATH)/%.c
 	@mkdir -p $(OBJS_PATH)
 	@$(COMPILER) $(FLAGS) $(OFLAGS) -o $@ $<
 

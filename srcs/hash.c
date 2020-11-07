@@ -19,7 +19,7 @@ static size_t     *init_sizes_tab(void)
     if (!(sizes_tab = malloc(sizeof(t_uint64) * NB_OF_CIPHERS)))
         return (NULL);
     sizes_tab[MD5] = 64;
-    sizes_tab[SHA256] = 128;
+    sizes_tab[SHA256] = 64;
     return (sizes_tab);
 }
 
