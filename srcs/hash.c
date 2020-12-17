@@ -1,5 +1,6 @@
 #include "ft_ssl.h"
 #include "ft_md5.h"
+#include "ft_sha.h"
 
 static hash_fn  *init_func_tab(void)
 {
@@ -8,7 +9,7 @@ static hash_fn  *init_func_tab(void)
     if (!(func_tab = malloc(sizeof(hash_fn) * NB_OF_CIPHERS)))
         return (NULL);
     func_tab[MD5] = &md5;
-    func_tab[SHA256] = &md5; // temporary
+    func_tab[SHA256] = &sha256;
     return (func_tab);
 }
 
@@ -26,6 +27,7 @@ static size_t     *init_sizes_tab(void)
 #include <stdio.h>
 static char         *read_iterator(hash_fn hash, size_t read_size, int fd)
 {
+    static t_uint32    last_len = 0;
     t_uint32    len;
     char        *buf;
     char        *result;
@@ -33,12 +35,15 @@ static char         *read_iterator(hash_fn hash, size_t read_size, int fd)
     result = NULL;
     if (!(buf = malloc(read_size + 1)))
         return (NULL);
-    ft_bzero(buf, 65);
+    ft_bzero(buf, read_size + 1);
     while((len = read(fd, buf, read_size)) > 0)
     {
         result = hash(buf, len);
-		ft_bzero(buf, 65);
+		ft_bzero(buf, read_size + 1);
+        last_len = len;
     }
+    if (last_len == 64)
+        result = hash(NULL, 0);
     free(buf);
     return (result);
 }

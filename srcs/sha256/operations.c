@@ -3,10 +3,7 @@
             
 static t_uint32    ror32(t_uint32 v, t_uint16 n)
 {
-    t_uint32    mask;
-
-    mask = (1 << n) - 1;
-    return ((v << (32 - n)) & mask) | ((v >> n) & ~mask);
+    return (((v) >> (n)) | ((v) << (32-(n))));
 }
 
 t_uint32    ch(t_uint32 x, t_uint32 y, t_uint32 z)

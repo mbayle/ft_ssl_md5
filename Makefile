@@ -6,7 +6,7 @@
 #    By: admin <admin@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/18 04:08:14 by lmontagn          #+#    #+#              #
-#    Updated: 2020/10/04 18:00:06 by admin            ###   ########.fr        #
+#    Updated: 2020/12/17 19:04:22 by admin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,9 +29,12 @@ SRCS		=	main.c \
 
 SRCS_MD5	=	md5.c \
 				operations_md5.c \
-				init.c
+				init_md5.c
 
-SRCS_SHA	=	operations.c
+SRCS_SHA	=	sha256.c \
+				init_sha256.c \
+				operations.c
+
 
 OBJS		= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS))
 OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_MD5))
