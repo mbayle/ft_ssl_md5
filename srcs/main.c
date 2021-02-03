@@ -46,6 +46,8 @@ static t_cipher		get_cipher(char	*cipher)
 		return (MD5);
 	if (!ft_strcmp(cipher, "sha256") || !ft_strcmp(cipher, "SHA256"))
 		return (SHA256);
+	if (!ft_strcmp(cipher, "whirlpool") || !ft_strcmp(cipher, "WHIRLPOOL"))
+		return (WHIRLPOOL);
 	return (ERROR);
 }
 

@@ -11,11 +11,9 @@
 
 typedef unsigned char BYTE;             // 8-bit byte
 typedef unsigned int  WORD;             // 32-bit word, change to "long" for 16-bit machines
-typedef unsigned long DWORD;            // 64-bit word
-
-typedef unsigned long	t_uint64;
-typedef unsigned int	t_uint32;
-typedef unsigned short	t_uint16;
+typedef unsigned long  t_uint64;
+typedef unsigned int  t_uint32;
+typedef unsigned short  t_uint16;
 
 typedef union	shaunion
 {
@@ -127,30 +125,19 @@ t_uint32    low_sig1(t_uint32 x)
     return (ror32(x, 17) ^ ror32(x, 19) ^ (x >> 10));
 }
 
-void sha256_init(SHA256_CTX *ctx)
-{
-	printf("\tEntering sha256_init\n");
-	ctx->datalen = 0;
-	ctx->bitlen = 0;
-	ctx->state[0] = 0x6a09e667;
-	ctx->state[1] = 0xbb67ae85;
-	ctx->state[2] = 0x3c6ef372;
-	ctx->state[3] = 0xa54ff53a;
-	ctx->state[4] = 0x510e527f;
-	ctx->state[5] = 0x9b05688c;
-	ctx->state[6] = 0x1f83d9ab;
-	ctx->state[7] = 0x5be0cd19;
-	print_states(ctx, 1);
-	printf("\tExitting sha256_init\n\n");
-}
-
 void sha256_transform(SHA256_CTX *ctx, const BYTE data[])
 {
-	t_uint32	a, b, c, d, e, f, g, h, i, t1, t2;
-	t_uint32	*m = ctx->word;
+	//unsigned a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
+	unsigned a, b, c, d, e, f, g, h, i, t1, t2;
 
 	printf("\t\tEntering sha256_transform\n");
-
+	/*
+	for (i = 0, j = 0; i < 16; ++i, j += 4)
+		m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
+	for ( ; i < 64; ++i)
+		m[i] = low_sig1(m[i - 2]) + m[i - 7] + low_sig0(m[i - 15]) + m[i - 16];
+	*/
+	t_uint32	*m = ctx->word;
 	for (i = 0; i < 16; i++)
 		m[i] = SWAP32(m[i]);
 	printf("test:\n");
@@ -166,10 +153,10 @@ void sha256_transform(SHA256_CTX *ctx, const BYTE data[])
 	g = ctx->state[6];
 	h = ctx->state[7];
 
-	for (i = 0; i < 64; i++)
-	{
+	for (i = 0; i < 64; i++) {
 		if (i >= 16)
 			M(i) += low_sig1(M(i + 14)) + M(i + 9) + low_sig0(M(i +1));
+		//t1 = h + up_sig1(e) + ch(e,f,g) + k[i] + m[i];
 		t1 = h + up_sig1(e) + ch(e,f,g) + k[i] + M(i);
 		t2 = up_sig0(a) + maj(a,b,c);
 		h = g;
@@ -192,6 +179,23 @@ void sha256_transform(SHA256_CTX *ctx, const BYTE data[])
 	ctx->state[7] += h;
 	print_states(ctx, 2);
 	printf("\t\tExitting sha256_transform\n");
+}
+
+void sha256_init(SHA256_CTX *ctx)
+{
+	printf("\tEntering sha256_init\n");
+	ctx->datalen = 0;
+	ctx->bitlen = 0;
+	ctx->state[0] = 0x6a09e667;
+	ctx->state[1] = 0xbb67ae85;
+	ctx->state[2] = 0x3c6ef372;
+	ctx->state[3] = 0xa54ff53a;
+	ctx->state[4] = 0x510e527f;
+	ctx->state[5] = 0x9b05688c;
+	ctx->state[6] = 0x1f83d9ab;
+	ctx->state[7] = 0x5be0cd19;
+	print_states(ctx, 1);
+	printf("\tExitting sha256_init\n\n");
 }
 
 void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len)
@@ -235,17 +239,41 @@ void sha256_final(SHA256_CTX *ctx, BYTE hash[])
 	ctx->bitlen += ctx->datalen * 8;
 	ctx->word[14] = 0;
 	ctx->word[15] = SWAP32(ctx->bitlen);
+	/*
+	ctx->data[63] = ctx->bitlen;
+	ctx->data[62] = ctx->bitlen >> 8;
+	ctx->data[61] = ctx->bitlen >> 16;
+	ctx->data[60] = ctx->bitlen >> 24;
+	ctx->data[59] = ctx->bitlen >> 32;
+	ctx->data[58] = ctx->bitlen >> 40;
+	ctx->data[57] = ctx->bitlen >> 48;
+	ctx->data[56] = ctx->bitlen >> 56;
+	*/
 	printf("test: 0x");
 	for (int x = 0; x < 64; x++)
 		printf("%x", ctx->data[x]);
 	printf("\n");
-
 	sha256_transform(ctx, ctx->data);
 
 	for (i = 0; i < 8; i++)
 		ctx->state[i] = SWAP32(ctx->state[i]);
 	memcpy(hash, ctx->digest, 32);
-
+	/*
+	for (i = 0; i < 4; ++i) {
+		hash[i]      = (ctx->state[0] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 4]  = (ctx->state[1] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 8]  = (ctx->state[2] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 12] = (ctx->state[3] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 16] = (ctx->state[4] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 20] = (ctx->state[5] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 24] = (ctx->state[6] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 28] = (ctx->state[7] >> (24 - i * 8)) & 0x000000ff;
+	}
+	*/
+	printf("test2: 0x");
+	for (int x = 0; x < 32; x++)
+		printf("%x", hash[x]);
+	printf("\n");
 	print_states(ctx, 1);
 	printf("\tExitting sha256_final\n");
 }

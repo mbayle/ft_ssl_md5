@@ -196,6 +196,7 @@ char    *sha256(const char *msg, t_uint32 len)
     t_uint8                digest[36];
     char                   *hash;
 
+	hash = NULL;
     if (context == NULL)
     {
         if (!(context = malloc(sizeof(t_sha256_ctx))))
@@ -207,9 +208,8 @@ char    *sha256(const char *msg, t_uint32 len)
     if (len < 64)
 	{
         sha256_final(context, (t_uint8 *)digest);
+		hash = generate_hash((t_uint8 *)digest);
         free(context);
 	}
-
-	hash = generate_hash((t_uint8 *)digest);
     return (hash);
 }

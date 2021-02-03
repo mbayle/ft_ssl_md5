@@ -20,6 +20,7 @@
 typedef enum		e_cipher {
 	MD5,
 	SHA256,
+	WHIRLPOOL,
     NB_OF_CIPHERS,
     ERROR,
 }                   t_cipher;
