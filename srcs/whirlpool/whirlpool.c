@@ -1,9 +1,10 @@
 #include "ft_ssl.h"
 #include "ft_whirlpool.h"
+#include "endianness.h"
 
 extern t_uint64	g_whirlpool_sbox[8][256];
 
-void whirlpool_init(struct whirlpool_ctx* ctx)
+static void whirlpool_init(struct whirlpool_ctx* ctx)
 {
 	ctx->length = 0;
 	ft_bzero(ctx->hash, sizeof(ctx->hash));
@@ -126,19 +127,6 @@ void whirlpool_final(t_whirlpool_ctx* ctx, unsigned char* result)
 	be64_copy(result, 0, ctx->hash, 64);
 }
 
-t_uint64 wswap_uint64(t_uint64 val)
-{
-	val = ((val << 8) & 0xFF00FF00FF00FF00ULL ) | ((val >> 8) & 0x00FF00FF00FF00FFULL );
-	val = ((val << 16) & 0xFFFF0000FFFF0000ULL ) | ((val >> 16) & 0x0000FFFF0000FFFFULL );
-	return (val << 32) | (val >> 32);
-}
-
-t_uint32 wswap_uint32(t_uint32 val)
-{
-	val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF ); 
-	return (val << 16) | (val >> 16);
-}
-
 void    whirlpoolblock(char *str, u_whirlpool block)
 {
 	t_uint8	    i;
@@ -193,18 +181,19 @@ char    *whirlpool(const char *msg, t_uint32 len)
     static t_whirlpool_ctx	*context = NULL;
 	char					*hash;
 
-	hash = malloc(129);
+	hash = NULL;
     if (context == NULL)
     {
         if (!(context = malloc(sizeof(t_whirlpool_ctx))))
             return (NULL);
 		whirlpool_init(context);
     }
-
     whirlpool_update(context, (t_uint8 *)msg , len);
 	if (len < BLOCK_SIZE)
 	{
+		hash = malloc(129);
 		whirlpool_final(context, (t_uint8 *)hash);
+		free(hash);
 		hash = generate_hash(context);
 		free(context);
 	}

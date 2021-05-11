@@ -11,6 +11,7 @@ static hash_fn  *init_func_tab(void)
         return (NULL);
     func_tab[MD5] = &md5;
     func_tab[SHA256] = &sha256;
+    func_tab[SHA512] = &sha512;
 	func_tab[WHIRLPOOL] = &whirlpool;
     return (func_tab);
 }
@@ -23,6 +24,7 @@ static size_t     *init_sizes_tab(void)
         return (NULL);
     sizes_tab[MD5] = 64;
     sizes_tab[SHA256] = 64;
+    sizes_tab[SHA512] = 128;
     sizes_tab[WHIRLPOOL] = 64;
     return (sizes_tab);
 }
@@ -44,7 +46,7 @@ static char         *read_iterator(hash_fn hash, size_t read_size, int fd)
 		ft_bzero(buf, read_size + 1);
         last_len = len;
     }
-    if (last_len == read_size)
+    if (last_len == read_size || last_len == 0)
         result = hash(NULL, 0);
     free(buf);
     return (result);

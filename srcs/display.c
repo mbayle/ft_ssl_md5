@@ -14,6 +14,8 @@ static void print_cipher(const t_cipher cipher, int fd)
         write(fd, "MD5", 3);
     if (cipher == SHA256)
         write(fd, "SHA256", 6);
+    if (cipher == SHA512)
+        write(fd, "SHA512", 6);
     if (cipher == WHIRLPOOL)
 		write(fd, "WHIRLPOOL", 9);
 }

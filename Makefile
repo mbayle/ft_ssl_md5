@@ -18,13 +18,15 @@ OFLAGS = -c -I includes
 
 SRCS_PATH			= srcs
 SRCS_MD5_PATH		= srcs/md5
-SRCS_SHA_PATH		= srcs/sha256
+SRCS_SHA256_PATH	= srcs/sha256
+SRCS_SHA512_PATH	= srcs/sha512
 SRCS_WHIRLPOOL_PATH	= srcs/whirlpool
 OBJS_PATH			= objs
 
 SRCS			=	main.c \
 					hash.c \
 					misc.c \
+					endianness.c \
 					display.c \
 					help.c
 
@@ -32,18 +34,20 @@ SRCS_MD5		=	md5.c \
 					operations_md5.c \
 					init_md5.c
 
-SRCS_SHA		=	sha256.c \
+SRCS_SHA256		=	sha256.c \
 					init_sha256.c \
 					operations.c
 
+SRCS_SHA512		=	sha512.c
+
 SRCS_WHIRLPOOL	=	whirlpool.c \
 					whirl_sbox.c \
-					whirl_endianness.c \
 					whirl_operations.c
 
 OBJS		= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS))
 OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_MD5))
-OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_SHA))
+OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_SHA256))
+OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_SHA512))
 OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_WHIRLPOOL))
 
 INCLUDES =	includes
@@ -54,7 +58,11 @@ $(OBJS_PATH)/%.o : $(SRCS_MD5_PATH)/%.c
 	@mkdir -p $(OBJS_PATH)
 	@$(COMPILER) $(FLAGS) $(OFLAGS) -o $@ $<
 
-$(OBJS_PATH)/%.o : $(SRCS_SHA_PATH)/%.c
+$(OBJS_PATH)/%.o : $(SRCS_SHA256_PATH)/%.c
+	@mkdir -p $(OBJS_PATH)
+	@$(COMPILER) $(FLAGS) $(OFLAGS) -o $@ $<
+
+$(OBJS_PATH)/%.o : $(SRCS_SHA512_PATH)/%.c
 	@mkdir -p $(OBJS_PATH)
 	@$(COMPILER) $(FLAGS) $(OFLAGS) -o $@ $<
 
