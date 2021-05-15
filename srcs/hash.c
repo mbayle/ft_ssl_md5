@@ -29,14 +29,16 @@ static size_t     *init_sizes_tab(void)
     return (sizes_tab);
 }
 
+#include <stdio.h>
 static char         *read_iterator(hash_fn hash, size_t read_size, int fd)
 {
-    static t_uint32	last_len = 0;
+    t_uint32		last_len;
     t_uint32    	len;
     char        	*buf;
     char        	*result;
     
     result = NULL;
+	last_len = 0;
     if (!(buf = malloc(read_size + 1)))
         return (NULL);
     ft_bzero(buf, read_size + 1);
@@ -59,9 +61,11 @@ char                hash_message(const t_cipher cipher, const t_opt options, cha
     int                 fd;
     int                 i;
     char                *result;
+	char				return_value;
 
     fd = 0;
     i = 0;
+	return_value = SUCCESS;
     if (func_tab == NULL)
         if (!(func_tab = init_func_tab()))
             return (ERR_NO_MEM);
@@ -69,22 +73,27 @@ char                hash_message(const t_cipher cipher, const t_opt options, cha
         if (!(sizes_tab = init_sizes_tab()))
             return (ERR_NO_MEM);
     if (count == 0)
-        result = read_iterator(func_tab[cipher], sizes_tab[cipher], 1);
+	{
+        result = read_iterator(func_tab[cipher], sizes_tab[cipher], 0);
+		display_hash(result, options, cipher, "stdin");
+		free(result);
+	}
     while (i < count)
     {
         if ((fd = open(args[i], O_RDONLY)) == -1)
         {
-            free(sizes_tab);
-            free(func_tab);
-            return (ERR_OPEN);
+            return_value = ERR_OPEN;
+			printf("Error (placeholder)\n");
+			i++;
+			continue ;
         }
         result = read_iterator(func_tab[cipher], sizes_tab[cipher], fd);
+		display_hash(result, options, cipher, args[i]);
         close(fd);
+		free(result);
         i++;
     }
-    display_hash(result, options, cipher, args[0]);
-	free(result);
     free(sizes_tab);
     free(func_tab);
-    return (SUCCESS);
+    return (return_value);
 }

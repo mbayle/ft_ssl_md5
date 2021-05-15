@@ -21,7 +21,7 @@ static const unsigned k[64] = {
 };
 
 #include <stdio.h>
-static void		print_states(t_sha256_ctx *ctx, t_uint8 depth)
+void		print_states(t_sha256_ctx *ctx, t_uint8 depth)
 {
 	while (depth--)
 		printf("\t");
@@ -39,7 +39,7 @@ void sha256_transform(t_sha256_ctx *ctx, const t_uint8 data[])
 {
 	t_uint32 a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
-	printf("\t\tEntering sha256_transform\n");
+	//printf("\t\tEntering sha256_transform\n");
 	for (i = 0, j = 0; i < 16; ++i, j += 4)
 		m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
 	for ( ; i < 64; ++i)
@@ -75,15 +75,15 @@ void sha256_transform(t_sha256_ctx *ctx, const t_uint8 data[])
 	ctx->state[5] += f;
 	ctx->state[6] += g;
 	ctx->state[7] += h;
-	print_states(ctx, 2);
-	printf("\t\tExitting sha256_transform\n");
+	//print_states(ctx, 2);
+	//printf("\t\tExitting sha256_transform\n");
 }
 
 void sha256_update(t_sha256_ctx *ctx, const t_uint8 data[], size_t len)
 {
 	t_uint32 i;
 
-	printf("\tEntering sha256_update\n");
+	//printf("\tEntering sha256_update\n");
 	for (i = 0; i < len; ++i) {
 		ctx->buffer[ctx->datalen] = data[i];
 		ctx->datalen++;
@@ -93,15 +93,15 @@ void sha256_update(t_sha256_ctx *ctx, const t_uint8 data[], size_t len)
 			ctx->datalen = 0;
 		}
 	}
-	print_states(ctx, 1);
-	printf("\tExitting sha256_update\n\n");
+	//print_states(ctx, 1);
+	//printf("\tExitting sha256_update\n\n");
 }
 
 void sha256_final(t_sha256_ctx *ctx, t_uint8 hash[])
 {
 	t_uint32 i;
 
-	printf("\tEntering sha256_final\n");
+	//printf("\tEntering sha256_final\n");
 	i = ctx->datalen;
 
 	if (ctx->datalen < 56) {
@@ -138,8 +138,8 @@ void sha256_final(t_sha256_ctx *ctx, t_uint8 hash[])
 		hash[i + 24] = (ctx->state[6] >> (24 - i * 8)) & 0x000000ff;
 		hash[i + 28] = (ctx->state[7] >> (24 - i * 8)) & 0x000000ff;
 	}
-	print_states(ctx, 1);
-	printf("\tExitting sha256_final\n");
+	//print_states(ctx, 1);
+	//printf("\tExitting sha256_final\n");
 }
 
 void    shablock(char *str, u_sha256 block)
@@ -203,13 +203,13 @@ char    *sha256(const char *msg, t_uint32 len)
             return (NULL);
 		sha256_init(context);
     }
-
     sha256_update(context, (t_uint8 *)msg , len);
     if (len < 64)
 	{
         sha256_final(context, (t_uint8 *)digest);
 		hash = generate_hash((t_uint8 *)digest);
         free(context);
+		context = NULL;
 	}
     return (hash);
 }

@@ -231,6 +231,7 @@ char	*sha512(const char *content, t_uint32 size)
 			i++;
 		}
 		free(context);
+		context = NULL;
 	}
 	return (hash);
 }

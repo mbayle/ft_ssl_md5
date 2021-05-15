@@ -95,10 +95,14 @@ t_uint32	*calctable_init(void)
 	return (k);
 }
 
-void		context_init(t_uint32 *states)
+t_uint32	*context_init(void)
 {
+	t_uint32	*states;
+
+	states = malloc(sizeof(t_uint32) * 4);
 	states[0] = 0x67452301;
 	states[1] = 0xEFCDAB89;
 	states[2] = 0x98BADCFE;
 	states[3] = 0x10325476;
+	return (states);
 }

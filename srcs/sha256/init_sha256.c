@@ -4,7 +4,7 @@
 #include <stdio.h>
 void sha256_init(t_sha256_ctx *ctx)
 {
-	printf("\tEntering sha256_init\n");
+	//printf("\tEntering sha256_init\n");
 	ctx->datalen = 0;
 	ctx->bitlen = 0;
 	ctx->state[0] = SHA256_STATE1;
@@ -16,5 +16,5 @@ void sha256_init(t_sha256_ctx *ctx)
 	ctx->state[6] = SHA256_STATE7;
 	ctx->state[7] = SHA256_STATE8;
 	//print_states(ctx, 1);
-	printf("\tExitting sha256_init\n\n");
+	//printf("\tExitting sha256_init\n\n");
 }

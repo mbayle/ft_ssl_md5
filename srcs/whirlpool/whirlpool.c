@@ -196,6 +196,7 @@ char    *whirlpool(const char *msg, t_uint32 len)
 		free(hash);
 		hash = generate_hash(context);
 		free(context);
+		context = NULL;
 	}
 	return (hash);
 }

@@ -69,8 +69,7 @@ char  *md5(const char *msg, t_uint32 len);
 
 /* Initialization */
 t_uint32	*calctable_init(void);
-//t_md5_ctx	*context_init(void);
-void		context_init(t_uint32 *states);
+t_uint32	*context_init(void);
 
 /* Operations */
 t_uint32	func0(t_uint32 v[]);

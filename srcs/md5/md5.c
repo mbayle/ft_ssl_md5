@@ -29,7 +29,7 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 	static short		rot3[] = { S41, S42, S43, S44 };
 	static short		*rots[] = { rot0, rot1, rot2, rot3 };
 	static t_uint32		*k = NULL;
-	static t_uint32		context_states[] = { STATE1, STATE2, STATE3, STATE4 };
+	static t_uint32		*context_states = NULL;
 	u_block				block;
 
 	int                 q;
@@ -42,11 +42,11 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 	t_uint32 abcd[4];
 	short m, o, g;
 
-	//if (context == NULL)
-		//context = context_init();
-
-	if (k == NULL)
+	if (total_len == 0)
+	{
+		context_states = context_init();
 		k = calctable_init();
+	}
 
 	ft_bzero(msg2, 65);
 	ft_memcpy(msg2, msg, len);
@@ -88,7 +88,11 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 		p++;
 	}
 	if (len <= 54)
+	{
+		total_len = 0;
 		free(k);
+		k = NULL;
+	}
 	return context_states;
 }
 
@@ -144,7 +148,7 @@ char	*md5(const char *msg, t_uint32 len)
 			ft_strcat(hash, s);
 			i++;
 		}
+		free(digest);
 	}
 	return (hash);
 }
-
