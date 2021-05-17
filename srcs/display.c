@@ -1,11 +1,17 @@
 #include "ft_ssl.h"
 
 #include <string.h>
-static void print_filename(char *file_name, int fd)
+static void print_filename(char *file_name, int fd, t_uint8 is_string)
 {
-    write(fd, "(", 1);
-    write(fd, file_name, strlen(file_name)); // REPLACE THE STRLEN !!!
-    write(fd, ")= ", 3);
+	if (is_string)
+		write(fd, "(\"", 2);
+	else
+		write(fd, "(", 1);
+    write(fd, file_name, ft_strlen(file_name));
+	if (is_string)
+		write(fd, "\")= ", 4);
+	else
+		write(fd, ")= ", 3);
 }
 
 static void print_cipher(const t_cipher cipher, int fd)
@@ -20,7 +26,7 @@ static void print_cipher(const t_cipher cipher, int fd)
 		write(fd, "WHIRLPOOL", 9);
 }
 
-void        display_hash(char *hash, const t_opt options, const t_cipher cipher, char *file_name)
+void        display_hash(char *hash, const t_opt options, const t_cipher cipher, char *file_name, t_uint8 is_string)
 {
     int     fd;
 
@@ -28,11 +34,11 @@ void        display_hash(char *hash, const t_opt options, const t_cipher cipher,
     if (!options.r && !options.q && !options.p)
     {
 		print_cipher(cipher, fd); 
-		print_filename(file_name, fd);
+		print_filename(file_name, fd, is_string);
 		write(fd, hash, strlen(hash));
 		write(fd, "\n", 1);
     }
-	else if (options.q)
+	else if (options.q || options.p)
     {
 		write(fd, hash, strlen(hash));
 		write(fd, "\n", 1);

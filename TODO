@@ -1,0 +1,14 @@
+Ludo:
+	- Should we display "stdin" when reading pipes ?
+
+	- If the machine runs out of memory between the allocations of "func_tab"
+	and "sizes_tab", the former may leak.
+
+	- Find a way to get rid of display_hash's "is_string" argument ('cause it's
+	ugly).
+
+	- Hash sources to clean ?
+
+	- Add missing error messages
+
+	- Find another way to use the "p" option only once ?

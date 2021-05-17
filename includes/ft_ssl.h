@@ -59,7 +59,7 @@ typedef struct	s_opt {
 /*
 ** hash.c functions
 */
-char        hash_message(const t_cipher cipher, const t_opt options, char **args, int count);
+char        hash_message(const t_cipher cipher, t_opt options, char **args, int count);
 
 /*
 ** misc functions
@@ -69,11 +69,12 @@ int			ft_strcmp(const char *s1, const char *s2);
 char		*ft_strchr(const char *s, int c);
 char    	*ft_strcat(char *s1, const char *s2);
 void	    *ft_memcpy(void *dst, const void *src, size_t n);
+size_t		ft_strlen(const char *s);
 
 /*
 ** display functions
 */
-void    display_hash(char *hash, const t_opt options, const t_cipher cipher, char *args);
+void    display_hash(char *hash, const t_opt options, const t_cipher cipher, char *args, t_uint8 is_string);
 
 /*
 ** help.c function
