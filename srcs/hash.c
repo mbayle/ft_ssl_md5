@@ -93,7 +93,7 @@ static void			print_open_err(char *file)
 	}
 	else
 	{
-		write(STDERR, "ft_ssl: Error: insufficient rights to read \'", 44);
+		write(STDERR, "ft_ssl: Error: insufficient rights to open \'", 44);
 		write(STDERR, file, ft_strlen(file));
 		write(STDERR, "\'.\n", 3);
 	}
@@ -104,11 +104,13 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
     static hash_fn      *func_tab = NULL;
     static size_t       *sizes_tab = NULL;
     int                 fd;
+	int					out_fd;
     int                 i;
     char                *result;
 	char				return_value;
 
     fd = 0;
+	out_fd = STDOUT;
     i = 0;
 	return_value = SUCCESS;
     if (func_tab == NULL)
@@ -122,16 +124,27 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
         }
     if (count == 0 || options.p == TRUE)
 	{
-        result = read_iterator(func_tab[cipher], sizes_tab[cipher], 0, TRUE);
-		display_hash(result, options, cipher, "stdin", FALSE);
-		options.p = FALSE;
+		if (options.p == TRUE)
+			result = read_iterator(func_tab[cipher], sizes_tab[cipher], 0, TRUE);
+		else
+			result = read_iterator(func_tab[cipher], sizes_tab[cipher], 0, FALSE);
+		display_hash(result, options, cipher, "stdin", out_fd, FALSE);
 		free(result);
 	}
 	if (options.s == TRUE)
 	{
 		result = hash_string(func_tab[cipher], sizes_tab[cipher], args[i]);
-		display_hash(result, options, cipher, args[i], TRUE);
+		display_hash(result, options, cipher, args[i], out_fd, TRUE);
 		i++;
+	}
+	if (options.o == TRUE)
+	{
+		if ((out_fd = open(args[i], O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0)
+		{
+			print_open_err(args[i]);
+			return (ERR_OPEN);
+		}
+		i += 1;
 	}
     while (i < count)
     {
@@ -143,11 +156,13 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
 			continue ;
         }
         result = read_iterator(func_tab[cipher], sizes_tab[cipher], fd, FALSE);
-		display_hash(result, options, cipher, args[i], FALSE);
+		display_hash(result, options, cipher, args[i], out_fd, FALSE);
         close(fd);
 		free(result);
         i++;
     }
+	if (options.o == TRUE)
+		close(out_fd);
     free(sizes_tab);
     free(func_tab);
     return (return_value);

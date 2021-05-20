@@ -26,19 +26,16 @@ static void print_cipher(const t_cipher cipher, int fd)
 		write(fd, "WHIRLPOOL", 9);
 }
 
-void        display_hash(char *hash, const t_opt options, const t_cipher cipher, char *file_name, t_uint8 is_string)
+void        display_hash(char *hash, const t_opt options, const t_cipher cipher, char *file_name, int fd, t_uint8 is_string)
 {
-    int     fd;
-
-    fd = 1;
-    if (!options.r && !options.q && !options.p)
+    if (!options.r && !options.q)
     {
 		print_cipher(cipher, fd); 
 		print_filename(file_name, fd, is_string);
 		write(fd, hash, strlen(hash));
 		write(fd, "\n", 1);
     }
-	else if (options.q || options.p)
+	else if (options.q)
     {
 		write(fd, hash, strlen(hash));
 		write(fd, "\n", 1);

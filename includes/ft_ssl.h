@@ -78,7 +78,7 @@ size_t		ft_strlen(const char *s);
 /*
 ** display functions
 */
-void    display_hash(char *hash, const t_opt options, const t_cipher cipher, char *args, t_uint8 is_string);
+void    display_hash(char *hash, const t_opt options, const t_cipher cipher, char *args, int fd, t_uint8 is_string);
 
 /*
 ** help.c function

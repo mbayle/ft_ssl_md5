@@ -14,6 +14,7 @@ static void		set_option(t_opt *options, char flag)
 		options->o = TRUE;
 }
 
+#include <stdio.h>
 static t_opt	get_options(char **args, int count)
 {
 	t_uint32	i;
@@ -69,6 +70,8 @@ static int     get_last_option(char **args, int n)
     {
         if (args[i][0] != '-')
             break ;
+        if (args[i][1] == 'o' || args[i][1] == 's')
+			return (i + 1);
         i++;
     }
     return (i);

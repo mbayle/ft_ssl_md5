@@ -3,6 +3,4 @@ Ludo:
 
 	- Hash sources to clean ?
 
-	- Find another way to use the "p" option only once ?
-
-    - Replace all printf with write
+	- Printing error messages on stderr even when using the -o flag ?
