@@ -40,6 +40,14 @@ static t_opt	get_options(char **args, int count)
 	return (options);
 }
 
+static void			cipher_error(char *command)
+{
+	write(STDERR, "ft_ssl: Error: \'", 16);
+	write(STDERR, command, ft_strlen(command));
+	write(STDERR, "\' is an invlaid command.\n", 25);
+	write(STDERR, "\nMessage Digest commands:\nmd5\t\tsha256\nsha512\t\twhirlpool\n", 56);
+}
+
 static t_cipher		get_cipher(char	*cipher)
 {
 	if (!ft_strcmp(cipher, "md5") || !ft_strcmp(cipher, "MD5"))
@@ -80,7 +88,10 @@ int		main(int argc, char **argv)
 	}
 	cipher = get_cipher(argv[1]);
 	if (cipher == ERROR)
+	{
+		cipher_error(argv[1]);
 		exit (ERR_BAD_CIPHER);
+	}
 	options = get_options(&argv[2], argc - 2);
 	if (options.err == TRUE)
 		return (ERR_BAD_OPTION);

@@ -84,6 +84,22 @@ static char         *hash_string(hash_fn hash, size_t read_size, char *string)
     return (result);
 }
 
+static void			print_open_err(char *file)
+{
+	if (access(file, F_OK) < 0)
+	{
+		write(STDERR, "ft_ssl: Error: \'", 16);
+		write(STDERR, file, ft_strlen(file));
+		write(STDERR, "\' does not exist.\n", 18);
+	}
+	else
+	{
+		write(STDERR, "ft_ssl: Error: insufficient rights to read \'", 44);
+		write(STDERR, file, ft_strlen(file));
+		write(STDERR, "\'.\n", 3);
+	}
+}
+
 char                hash_message(const t_cipher cipher, t_opt options, char **args, int count)
 {
     static hash_fn      *func_tab = NULL;
@@ -120,7 +136,7 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
         if ((fd = open(args[i], O_RDONLY)) == -1)
         {
             return_value = ERR_OPEN;
-			printf("Error (placeholder)\n");
+			print_open_err(args[i]);
 			i++;
 			continue ;
         }
