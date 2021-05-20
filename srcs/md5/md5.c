@@ -1,7 +1,6 @@
 #include "ft_ssl.h"
 #include "ft_md5.h"
 
-#include <stdio.h>
 static void	md5_pad_msg(t_uint8 *msg, t_uint32 len, t_uint32 total_len)
 {
 	int		q;

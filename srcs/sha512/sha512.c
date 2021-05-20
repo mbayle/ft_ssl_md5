@@ -200,7 +200,6 @@ static void    sha512_block_to_str(char *str, u_sha512 block)
 	str[16] = '\0';
 }
 
-#include <stdio.h>
 char	*sha512(const char *content, t_uint32 size)
 {
 	static sha512_ctx		*context = NULL;

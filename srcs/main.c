@@ -1,5 +1,4 @@
 #include "ft_ssl.h"
-#include <stdio.h>
 
 static void		set_option(t_opt *options, char flag)
 {

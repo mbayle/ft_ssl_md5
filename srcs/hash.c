@@ -29,7 +29,6 @@ static size_t     *init_sizes_tab(void)
     return (sizes_tab);
 }
 
-#include <stdio.h>
 static char         *read_iterator(hash_fn hash, size_t read_size, int fd, t_uint8 print)
 {
     t_uint32		last_len;

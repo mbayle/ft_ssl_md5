@@ -20,26 +20,10 @@ static const unsigned k[64] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-#include <stdio.h>
-void		print_states(t_sha256_ctx *ctx, t_uint8 depth)
-{
-	while (depth--)
-		printf("\t");
-	printf("Current states: %#x:%#x:%#x:%#x:%#x:%#x:%#x:%#x\n", ctx->state[0],
-	ctx->state[1],
-	ctx->state[2],
-	ctx->state[3],
-	ctx->state[4],
-	ctx->state[5],
-	ctx->state[6],
-	ctx->state[7]);
-}
-
 void sha256_transform(t_sha256_ctx *ctx, const t_uint8 data[])
 {
 	t_uint32 a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
-	//printf("\t\tEntering sha256_transform\n");
 	for (i = 0, j = 0; i < 16; ++i, j += 4)
 		m[i] = (data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | (data[j + 3]);
 	for ( ; i < 64; ++i)
@@ -75,15 +59,12 @@ void sha256_transform(t_sha256_ctx *ctx, const t_uint8 data[])
 	ctx->state[5] += f;
 	ctx->state[6] += g;
 	ctx->state[7] += h;
-	//print_states(ctx, 2);
-	//printf("\t\tExitting sha256_transform\n");
 }
 
 void sha256_update(t_sha256_ctx *ctx, const t_uint8 data[], size_t len)
 {
 	t_uint32 i;
 
-	//printf("\tEntering sha256_update\n");
 	for (i = 0; i < len; ++i) {
 		ctx->buffer[ctx->datalen] = data[i];
 		ctx->datalen++;
@@ -93,15 +74,12 @@ void sha256_update(t_sha256_ctx *ctx, const t_uint8 data[], size_t len)
 			ctx->datalen = 0;
 		}
 	}
-	//print_states(ctx, 1);
-	//printf("\tExitting sha256_update\n\n");
 }
 
 void sha256_final(t_sha256_ctx *ctx, t_uint8 hash[])
 {
 	t_uint32 i;
 
-	//printf("\tEntering sha256_final\n");
 	i = ctx->datalen;
 
 	if (ctx->datalen < 56) {
@@ -138,8 +116,6 @@ void sha256_final(t_sha256_ctx *ctx, t_uint8 hash[])
 		hash[i + 24] = (ctx->state[6] >> (24 - i * 8)) & 0x000000ff;
 		hash[i + 28] = (ctx->state[7] >> (24 - i * 8)) & 0x000000ff;
 	}
-	//print_states(ctx, 1);
-	//printf("\tExitting sha256_final\n");
 }
 
 void    shablock(char *str, u_sha256 block)
