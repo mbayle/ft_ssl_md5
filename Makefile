@@ -42,8 +42,7 @@ SRCS_SHA512		=	sha512.c
 
 SRCS_WHIRLPOOL	=	whirlpool.c \
 					whirl_sbox.c \
-					whirl_operations.c \
-					whirl_endianness.c
+					whirl_operations.c
 
 OBJS		= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS))
 OBJS		+= $(patsubst %.c, $(OBJS_PATH)/%.o, $(SRCS_MD5))
