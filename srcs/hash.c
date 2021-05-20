@@ -101,7 +101,10 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
             return (ERR_NO_MEM);
     if (sizes_tab == NULL)
         if (!(sizes_tab = init_sizes_tab()))
+        {
+            free(func_tab);    
             return (ERR_NO_MEM);
+        }
     if (count == 0 || options.p == TRUE)
 	{
         result = read_iterator(func_tab[cipher], sizes_tab[cipher], 0, TRUE);
