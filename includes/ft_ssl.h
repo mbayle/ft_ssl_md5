@@ -5,6 +5,10 @@
 # include <stdlib.h>
 # include <fcntl.h>
 
+# define STDIN		0
+# define STDOUT		1
+# define STDERR		2
+
 # define FAILURE	1
 # define SUCCESS	0
 
