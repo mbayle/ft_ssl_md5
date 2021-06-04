@@ -117,11 +117,22 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
         if (!(func_tab = init_func_tab()))
             return (ERR_NO_MEM);
     if (sizes_tab == NULL)
+	{
         if (!(sizes_tab = init_sizes_tab()))
         {
             free(func_tab);    
             return (ERR_NO_MEM);
         }
+	}
+	if (options.o == TRUE)
+	{
+		if ((out_fd = open(args[i], O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0)
+		{
+			print_open_err(args[i]);
+			return (ERR_OPEN);
+		}
+		i += 1;
+	}
     if (count == 0 || options.p == TRUE)
 	{
 		if (options.p == TRUE)
@@ -136,15 +147,6 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
 		result = hash_string(func_tab[cipher], sizes_tab[cipher], args[i]);
 		display_hash(result, options, cipher, args[i], out_fd, TRUE);
 		i++;
-	}
-	if (options.o == TRUE)
-	{
-		if ((out_fd = open(args[i], O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0)
-		{
-			print_open_err(args[i]);
-			return (ERR_OPEN);
-		}
-		i += 1;
 	}
     while (i < count)
     {
