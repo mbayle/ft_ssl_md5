@@ -1,6 +1,2 @@
 Ludo:
 	- Should we display "stdin" when reading pipes ? (test with VM)
-
-	- Hash sources to clean ?
-
-	- Printing error messages on stderr even when using the -o flag ?

@@ -14,24 +14,38 @@ static void		set_option(t_opt *options, char flag)
 		options->o = TRUE;
 }
 
+static void		option_error(char *opt_string)
+{
+	write(STDERR, "ft_ssl: Error: option \'", 23);
+	write(STDERR, opt_string, ft_strlen(opt_string));
+	write(STDERR, "\' is invalid.\n", 14);
+}
+
 #include <stdio.h>
 static t_opt	get_options(char **args, int count)
 {
-	t_uint32	i;
+	t_uint16	i;
+	t_uint16	c;
 	t_opt		options;
 
 	i = 0;
 	ft_bzero(&options, sizeof(t_opt));
 	while (count--)
 	{
+		c = 1;
 		if (!(args[i][0] == '-'))
 			break ;
-		if (ft_strchr(OPT_CHARSET, args[i][1]) && !args[i][2])
-			set_option(&options, args[i][1]);
-		else
+		while (args[i][c])
 		{
-			options.err = TRUE;
-			break ;
+			if (ft_strchr(OPT_CHARSET, args[i][c]))
+				set_option(&options, args[i][c]);
+			else
+			{
+				option_error(args[i]);
+				options.err = TRUE;
+				break ;
+			}
+			c++;
 		}
 		if (args[i][1] == 's')
 			break ;
@@ -43,8 +57,7 @@ static t_opt	get_options(char **args, int count)
 static void			cipher_error(char *command)
 {
 	write(STDERR, "ft_ssl: Error: \'", 16);
-	write(STDERR, command, ft_strlen(command));
-	write(STDERR, "\' is an invlaid command.\n", 25);
+	write(STDERR, command, ft_strlen(command));	write(STDERR, "\' is an invlaid command.\n", 25);
 	write(STDERR, "\nMessage Digest commands:\nmd5\t\tsha256\nsha512\t\twhirlpool\n", 56);
 }
 

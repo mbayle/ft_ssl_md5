@@ -43,8 +43,13 @@ void        display_hash(char *hash, const t_opt options, const t_cipher cipher,
     else if (options.r)
     {
 		write(fd, hash, strlen(hash));
-		write(fd, " *", 2);
+		if (is_string)
+			write(fd, " \"", 2);
+		else
+			write(fd, " *", 2);
 		write(fd, file_name, strlen(file_name));
+		if (is_string)
+			write(fd, "\"", 1);
 		write(fd, "\n", 1);
     }
 }
