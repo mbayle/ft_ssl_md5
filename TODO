@@ -1,2 +1,0 @@
-Ludo:
-	- Should we display "stdin" when reading pipes ? (test with VM)
