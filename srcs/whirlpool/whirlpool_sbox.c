@@ -1,114 +1,7 @@
-#include <sys/types.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <string.h>
-#include <strings.h>
-#include <stdlib.h>
-#include <fcntl.h>
+#include "ft_whirlpool.h"
 
-typedef unsigned char	t_uint8;
-typedef unsigned short	t_uint16;
-typedef unsigned int	t_uint32;
-typedef unsigned long	t_uint64;
-
-typedef union	shaunion
+t_uint64	whirlpool_sbox[8][256] = {
 {
-	t_uint64	word;
-	t_uint8		byte[8];
-}				u_whirlpool;
-
-t_uint64 swap_uint64(t_uint64 val)
-{
-	val = ((val << 8) & 0xFF00FF00FF00FF00ULL ) | ((val >> 8) & 0x00FF00FF00FF00FFULL );
-	val = ((val << 16) & 0xFFFF0000FFFF0000ULL ) | ((val >> 16) & 0x0000FFFF0000FFFFULL );
-	return (val << 32) | (val >> 32);
-}
-
-t_uint32 swap_uint32(t_uint32 val)
-{
-	val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF ); 
-	return (val << 16) | (val >> 16);
-}
-
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-# define SWAP32(n) (swap_uint32(n))
-# define SWAP64(n) (swap_uint64(n))
-#else
-# define SWAP32(n) (n)
-# define SWAP64(n) (n)
-#endif
-
-#define whirlpool_block_size	64
-
-typedef struct whirlpool_ctx
-{
-	t_uint64	hash[8];    /* 512-bit algorithm internal hashing state */
-	unsigned char message[whirlpool_block_size]; /* 512-bit buffer to hash */
-
-	/* Note: original algorith uses 256-bit counter, allowing to
-	 * hash up to
-	 * 	   2^256 bits sized message. For optimization we use here
-	 * 	   64-bit counter,
-	 * 	   	   thus reducing maximal message size to 2^64 bits = 2
-	 * 	   	   Exbibytes = 2^21 TiB) */
-	t_uint64 length;     /* number of processed bytes */
-} whirlpool_ctx;
-
-
-#define IS_ALIGNED_64(p)		(0 == (7 & ((const char*)(p) - (const char*)0)))
-
-#define I64(x)					x##ULL
-
-#if IS_BIG_ENDIAN
-# define be2me_32(x) (x)
-# define be2me_64(x) (x)
-# define le2me_32(x) bswap_32(x)
-# define le2me_64(x) bswap_64(x)
-
-# define be32_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))
-# define le32_copy(to, index, from, length) rhash_swap_copy_str_to_u32((to), (index), (from), (length))
-# define be64_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))
-# define le64_copy(to, index, from, length) rhash_swap_copy_str_to_u64((to), (index), (from), (length))
-# define me64_to_be_str(to, from, length) memcpy((to), (from), (length))
-# define me64_to_le_str(to, from, length) rhash_swap_copy_u64_to_str((to), (from), (length))
-#else /* IS_BIG_ENDIAN */
-# define be2me_32(x) bswap_32(x)
-# define be2me_64(x) bswap_64(x)
-# define le2me_32(x) (x)
-# define le2me_64(x) (x)
-
-# define be32_copy(to, index, from, length) rhash_swap_copy_str_to_u32((to), (index), (from), (length))
-# define le32_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))
-# define be64_copy(to, index, from, length) rhash_swap_copy_str_to_u64((to), (index), (from), (length))
-# define le64_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))
-# define me64_to_be_str(to, from, length) rhash_swap_copy_u64_to_str((to), (from), (length))
-# define me64_to_le_str(to, from, length) memcpy((to), (from), (length))
-#endif /* IS_BIG_ENDIAN */
-
-static t_uint32 bswap_32(t_uint32 x)
-{
-	x = ((x << 8) & 0xFF00FF00u) | ((x >> 8) & 0x00FF00FFu);
-	return (x >> 16) | (x << 16);
-}
-
-static t_uint64 bswap_64(t_uint64 x)
-{
-	union {
-		t_uint64 ll;
-		t_uint32 l[2];
-	} w, r;
-	w.ll = x;
-	r.l[0] = bswap_32(w.l[1]);
-	r.l[1] = bswap_32(w.l[0]);
-	return r.ll;
-}
-
-t_uint64 rhash_whirlpool_sbox[8][256] = {
-{
-	/* C0 vectors */
 	I64(0x18186018c07830d8), I64(0x23238c2305af4626), I64(0xc6c63fc67ef991b8), I64(0xe8e887e8136fcdfb),
 	I64(0x878726874ca113cb), I64(0xb8b8dab8a9626d11), I64(0x0101040108050209), I64(0x4f4f214f426e9e0d),
 	I64(0x3636d836adee6c9b), I64(0xa6a6a2a6590451ff), I64(0xd2d26fd2debdb90c), I64(0xf5f5f3f5fb06f70e),
@@ -174,7 +67,6 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 	I64(0xcccc17cc2edb85e2), I64(0x424215422a578468), I64(0x98985a98b4c22d2c), I64(0xa4a4aaa4490e55ed),
 	I64(0x2828a0285d885075), I64(0x5c5c6d5cda31b886), I64(0xf8f8c7f8933fed6b), I64(0x8686228644a411c2),
 }, {
-	/* C1 vectors */
 	I64(0xd818186018c07830), I64(0x2623238c2305af46), I64(0xb8c6c63fc67ef991), I64(0xfbe8e887e8136fcd),
 		I64(0xcb878726874ca113), I64(0x11b8b8dab8a9626d), I64(0x0901010401080502), I64(0x0d4f4f214f426e9e),
 		I64(0x9b3636d836adee6c), I64(0xffa6a6a2a6590451), I64(0x0cd2d26fd2debdb9), I64(0x0ef5f5f3f5fb06f7),
@@ -240,7 +132,6 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 		I64(0xe2cccc17cc2edb85), I64(0x68424215422a5784), I64(0x2c98985a98b4c22d), I64(0xeda4a4aaa4490e55),
 		I64(0x752828a0285d8850), I64(0x865c5c6d5cda31b8), I64(0x6bf8f8c7f8933fed), I64(0xc28686228644a411),
 }, {
-	/* C2 vectors */
 	I64(0x30d818186018c078), I64(0x462623238c2305af), I64(0x91b8c6c63fc67ef9), I64(0xcdfbe8e887e8136f),
 		I64(0x13cb878726874ca1), I64(0x6d11b8b8dab8a962), I64(0x0209010104010805), I64(0x9e0d4f4f214f426e),
 		I64(0x6c9b3636d836adee), I64(0x51ffa6a6a2a65904), I64(0xb90cd2d26fd2debd), I64(0xf70ef5f5f3f5fb06),
@@ -306,7 +197,6 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 		I64(0x85e2cccc17cc2edb), I64(0x8468424215422a57), I64(0x2d2c98985a98b4c2), I64(0x55eda4a4aaa4490e),
 		I64(0x50752828a0285d88), I64(0xb8865c5c6d5cda31), I64(0xed6bf8f8c7f8933f), I64(0x11c28686228644a4),
 }, {
-	/* C3 vectors */
 	I64(0x7830d818186018c0), I64(0xaf462623238c2305), I64(0xf991b8c6c63fc67e), I64(0x6fcdfbe8e887e813),
 		I64(0xa113cb878726874c), I64(0x626d11b8b8dab8a9), I64(0x0502090101040108), I64(0x6e9e0d4f4f214f42),
 		I64(0xee6c9b3636d836ad), I64(0x0451ffa6a6a2a659), I64(0xbdb90cd2d26fd2de), I64(0x06f70ef5f5f3f5fb),
@@ -372,7 +262,6 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 		I64(0xdb85e2cccc17cc2e), I64(0x578468424215422a), I64(0xc22d2c98985a98b4), I64(0x0e55eda4a4aaa449),
 		I64(0x8850752828a0285d), I64(0x31b8865c5c6d5cda), I64(0x3fed6bf8f8c7f893), I64(0xa411c28686228644),
 }, {
-	/* C4 vectors */
 	I64(0xc07830d818186018), I64(0x05af462623238c23), I64(0x7ef991b8c6c63fc6), I64(0x136fcdfbe8e887e8),
 		I64(0x4ca113cb87872687), I64(0xa9626d11b8b8dab8), I64(0x0805020901010401), I64(0x426e9e0d4f4f214f),
 		I64(0xadee6c9b3636d836), I64(0x590451ffa6a6a2a6), I64(0xdebdb90cd2d26fd2), I64(0xfb06f70ef5f5f3f5),
@@ -438,7 +327,6 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 		I64(0x2edb85e2cccc17cc), I64(0x2a57846842421542), I64(0xb4c22d2c98985a98), I64(0x490e55eda4a4aaa4),
 		I64(0x5d8850752828a028), I64(0xda31b8865c5c6d5c), I64(0x933fed6bf8f8c7f8), I64(0x44a411c286862286),
 }, {
-	/* C5 vectors */
 	I64(0x18c07830d8181860), I64(0x2305af462623238c), I64(0xc67ef991b8c6c63f), I64(0xe8136fcdfbe8e887),
 		I64(0x874ca113cb878726), I64(0xb8a9626d11b8b8da), I64(0x0108050209010104), I64(0x4f426e9e0d4f4f21),
 		I64(0x36adee6c9b3636d8), I64(0xa6590451ffa6a6a2), I64(0xd2debdb90cd2d26f), I64(0xf5fb06f70ef5f5f3),
@@ -504,7 +392,6 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 		I64(0xcc2edb85e2cccc17), I64(0x422a578468424215), I64(0x98b4c22d2c98985a), I64(0xa4490e55eda4a4aa),
 		I64(0x285d8850752828a0), I64(0x5cda31b8865c5c6d), I64(0xf8933fed6bf8f8c7), I64(0x8644a411c2868622),
 }, {
-	/* C6 vectors */
 	I64(0x6018c07830d81818), I64(0x8c2305af46262323), I64(0x3fc67ef991b8c6c6), I64(0x87e8136fcdfbe8e8),
 		I64(0x26874ca113cb8787), I64(0xdab8a9626d11b8b8), I64(0x0401080502090101), I64(0x214f426e9e0d4f4f),
 		I64(0xd836adee6c9b3636), I64(0xa2a6590451ffa6a6), I64(0x6fd2debdb90cd2d2), I64(0xf3f5fb06f70ef5f5),
@@ -570,7 +457,6 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 		I64(0x17cc2edb85e2cccc), I64(0x15422a5784684242), I64(0x5a98b4c22d2c9898), I64(0xaaa4490e55eda4a4),
 		I64(0xa0285d8850752828), I64(0x6d5cda31b8865c5c), I64(0xc7f8933fed6bf8f8), I64(0x228644a411c28686),
 }, {
-	/* C7 vectors */
 	I64(0x186018c07830d818), I64(0x238c2305af462623), I64(0xc63fc67ef991b8c6), I64(0xe887e8136fcdfbe8),
 		I64(0x8726874ca113cb87), I64(0xb8dab8a9626d11b8), I64(0x0104010805020901), I64(0x4f214f426e9e0d4f),
 		I64(0x36d836adee6c9b36), I64(0xa6a2a6590451ffa6), I64(0xd26fd2debdb90cd2), I64(0xf5f3f5fb06f70ef5),
@@ -635,246 +521,5 @@ t_uint64 rhash_whirlpool_sbox[8][256] = {
 		I64(0x70dd70a7ade0d770), I64(0xb6e2b6d954716fb6), I64(0xd067d0ceb7bd1ed0), I64(0xed93ed3b7ec7d6ed),
 		I64(0xcc17cc2edb85e2cc), I64(0x4215422a57846842), I64(0x985a98b4c22d2c98), I64(0xa4aaa4490e55eda4),
 		I64(0x28a0285d88507528), I64(0x5c6d5cda31b8865c), I64(0xf8c7f8933fed6bf8), I64(0x86228644a411c286),
-}
+	}
 };
-
-#define WHIRLPOOL_OP(src, shift) ( \
-		rhash_whirlpool_sbox[0][(int)(src[ shift      & 7] >> 56)       ] ^ \
-		rhash_whirlpool_sbox[1][(int)(src[(shift + 7) & 7] >> 48) & 0xff] ^ \
-		rhash_whirlpool_sbox[2][(int)(src[(shift + 6) & 7] >> 40) & 0xff] ^ \
-		rhash_whirlpool_sbox[3][(int)(src[(shift + 5) & 7] >> 32) & 0xff] ^ \
-		rhash_whirlpool_sbox[4][(int)(src[(shift + 4) & 7] >> 24) & 0xff] ^ \
-		rhash_whirlpool_sbox[5][(int)(src[(shift + 3) & 7] >> 16) & 0xff] ^ \
-		rhash_whirlpool_sbox[6][(int)(src[(shift + 2) & 7] >>  8) & 0xff] ^ \
-		rhash_whirlpool_sbox[7][(int)(src[(shift + 1) & 7]      ) & 0xff])
-
-void rhash_swap_copy_str_to_u64(void* to, int index, const void* from, size_t length)
-{
-	/* if all pointers and length are 64-bits aligned */
-	if ( 0 == (( (int)((char*)to - (char*)0) | ((char*)from - (char*)0) | index | length ) & 7) ) {
-		/* copy aligned memory block as 64-bit integers */
-		const t_uint64* src = (const t_uint64*)from;
-		const t_uint64* end = (const t_uint64*)((const char*)src + length);
-		t_uint64* dst = (t_uint64*)((char*)to + index);
-		while (src < end) *(dst++) = bswap_64( *(src++) );
-	} else {
-		const char* src = (const char*)from;
-		for (length += index; (size_t)index < length; index++) ((char*)to)[index ^ 7] = *(src++);
-	}
-}
-
-void whirlpool_init(struct whirlpool_ctx* ctx)
-{
-	ctx->length = 0;
-	memset(ctx->hash, 0, sizeof(ctx->hash));
-}
-
-static void whirlpool_process_block(t_uint64* hash, t_uint64* p_block)
-{
-	int i;                /* loop counter */
-	t_uint64 K[2][8];       /* key */
-	t_uint64 state[2][8];   /* state */
-
-	/* alternating binary flags */
-	unsigned int m = 0;
-
-	/* the number of rounds of the internal dedicated block cipher */
-	const int number_of_rounds = 10;
-
-	/* array used in the rounds */
-	static const t_uint64 rc[10] = {
-		I64(0x1823c6e887b8014f),
-		I64(0x36a6d2f5796f9152),
-		I64(0x60bc9b8ea30c7b35),
-		I64(0x1de0d7c22e4bfe57),
-		I64(0x157737e59ff04ada),
-		I64(0x58c9290ab1a06b85),
-		I64(0xbd5d10f4cb3e0567),
-		I64(0xe427418ba77d95d8),
-		I64(0xfbee7c66dd17479e),
-		I64(0xca2dbf07ad5a8333)
-	};
-	/* map the message buffer to a block */
-	for (i = 0; i < 8; i++) {
-		/* store K^0 and xor it with the intermediate hash state */
-		K[0][i] = hash[i];
-		state[0][i] = be2me_64(p_block[i]) ^ hash[i];
-		hash[i] = state[0][i];
-	}
-	/* iterate over algorithm rounds */
-	for (i = 0; i < number_of_rounds; i++)
-	{
-		/* compute K^i from K^{i-1} */
-		K[m ^ 1][0] = WHIRLPOOL_OP(K[m], 0) ^ rc[i];
-		K[m ^ 1][1] = WHIRLPOOL_OP(K[m], 1);
-		K[m ^ 1][2] = WHIRLPOOL_OP(K[m], 2);
-		K[m ^ 1][3] = WHIRLPOOL_OP(K[m], 3);
-		K[m ^ 1][4] = WHIRLPOOL_OP(K[m], 4);
-		K[m ^ 1][5] = WHIRLPOOL_OP(K[m], 5);
-		K[m ^ 1][6] = WHIRLPOOL_OP(K[m], 6);
-		K[m ^ 1][7] = WHIRLPOOL_OP(K[m], 7);
-
-		/* apply the i-th round transformation */
-		state[m ^ 1][0] = WHIRLPOOL_OP(state[m], 0) ^ K[m ^ 1][0];
-		state[m ^ 1][1] = WHIRLPOOL_OP(state[m], 1) ^ K[m ^ 1][1];
-		state[m ^ 1][2] = WHIRLPOOL_OP(state[m], 2) ^ K[m ^ 1][2];
-		state[m ^ 1][3] = WHIRLPOOL_OP(state[m], 3) ^ K[m ^ 1][3];
-		state[m ^ 1][4] = WHIRLPOOL_OP(state[m], 4) ^ K[m ^ 1][4];
-		state[m ^ 1][5] = WHIRLPOOL_OP(state[m], 5) ^ K[m ^ 1][5];
-		state[m ^ 1][6] = WHIRLPOOL_OP(state[m], 6) ^ K[m ^ 1][6];
-		state[m ^ 1][7] = WHIRLPOOL_OP(state[m], 7) ^ K[m ^ 1][7];
-
-		m = m ^ 1;
-	}
-
-	/* apply the Miyaguchi-Preneel compression function */
-	hash[0] ^= state[0][0];
-	hash[1] ^= state[0][1];
-	hash[2] ^= state[0][2];
-	hash[3] ^= state[0][3];
-	hash[4] ^= state[0][4];
-	hash[5] ^= state[0][5];
-	hash[6] ^= state[0][6];
-	hash[7] ^= state[0][7];
-}
-
-void whirlpool_update(whirlpool_ctx* ctx, const unsigned char* msg, size_t size)
-{
-	unsigned index = (unsigned)ctx->length & 63;
-	unsigned left;
-	ctx->length += size;
-
-	/* fill partial block */
-	if (index) {
-		left = whirlpool_block_size - index;
-		memcpy(ctx->message + index, msg, (size < left ? size : left));
-		if (size < left) return;
-
-		/* process partial block
-		 * */
-		whirlpool_process_block(ctx->hash, (t_uint64*)ctx->message);
-		msg  += left;
-		size -= left;
-	}
-	while (size >= whirlpool_block_size) {
-		t_uint64* aligned_message_block;
-		if (IS_ALIGNED_64(msg)) {
-			/* the most common case is processing of
-			 * an already aligned message
-			 * 			without copying it */
-			aligned_message_block = (t_uint64*)msg;
-		} else {
-			memcpy(ctx->message, msg, whirlpool_block_size);
-			aligned_message_block = (t_uint64*)ctx->message;
-		}
-
-		whirlpool_process_block(ctx->hash, aligned_message_block);
-		msg += whirlpool_block_size;
-		size -= whirlpool_block_size;
-	}
-	if (size) {
-		/* save leftovers */
-		memcpy(ctx->message, msg, size);
-	}
-}
-
-void whirlpool_final(whirlpool_ctx* ctx, unsigned char* result)
-{
-	unsigned index = (unsigned)ctx->length & 63;
-	t_uint64* msg64 = (t_uint64*)ctx->message;
-
-	/* pad message and run for last block */
-	ctx->message[index++] = 0x80;
-
-	/* if no room left in the message to store 256-bit message length */
-	if (index > 32) {
-		/* then pad the rest with zeros and process it */
-		while (index < 64) {
-			ctx->message[index++] = 0;
-		}
-		whirlpool_process_block(ctx->hash, msg64);
-		index = 0;
-	}
-	/* due to optimization actually only 64-bit of message length are stored */
-	while (index < 56) {
-		ctx->message[index++] = 0;
-	}
-	msg64[7] = be2me_64(ctx->length << 3);
-	whirlpool_process_block(ctx->hash, msg64);
-
-	/* save result hash */
-	be64_copy(result, 0, ctx->hash, 64);
-}
-
-void    block_to_str(char *str, u_whirlpool block)
-{
-	t_uint8	    i;
-	char        j;
-	char        n;
-
-	i = 0;
-	block.word = SWAP64(block.word);
-	while (i < 8)
-	{
-		if (block.byte[i] <= 16)
-			str[i * 2] = '0';
-		j = 3;
-		while (--j)
-		{
-			n = block.byte[i] % 16;
-			if (n <= 9)
-				str[i * 2 + (j - 1)] = n + '0';
-			else
-				str[i * 2 + (j - 1)] = n - 10 + 'a';
-			block.byte[i] = block.byte[i] / 16;
-		}
-		i++;
-	}
-	str[16] = '\0';
-}
-
-char	*whirlpool_test(char *content, size_t size)
-{
-	char			*hash;
-	char			s[17];
-	whirlpool_ctx	*context;
-
-	hash = malloc(129);
-	bzero(hash, 129);
-	context = malloc(sizeof(whirlpool_ctx));
-
-	whirlpool_init(context);
-	whirlpool_update(context, (const t_uint8 *)content, size);
-	whirlpool_final(context, (t_uint8 *)hash);
-	for (int i = 0; i < 8; i++)
-		printf(" - %#lx\n", context->hash[i]);
-	u_whirlpool	block;
-	bzero(hash, 129);
-	int i = 0;
-	while (i < 8)
-	{
-		block.word = ((t_uint64 *)context->hash)[i];
-		bzero(s, 17);
-		block_to_str((char *)s, block);
-		strcat(hash, s);
-		i++;
-	}
-	return (hash);
-}
-
-int		main(int argc, char **argv)
-{
-	int				fd;
-	struct stat		file_stats;
-	char			*file_content;
-	char			*final_hash;
-
-	fd = open(argv[1], O_RDONLY);
-	fstat(fd, &file_stats);
-	printf("File name: %s\nFile size: %lu\n\n", argv[1], file_stats.st_size);
-	file_content = mmap(NULL, file_stats.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	final_hash = whirlpool_test(file_content, file_stats.st_size);
-	printf("\nFinal hash:\n%s\n", final_hash);
-	(void)argc;
-	return (0);
-}

@@ -44,9 +44,9 @@ typedef unsigned long	t_uint64;
 
 /* md5 context */
 typedef struct {
-	t_uint32		state[4];                                   /* state (ABCD) */
+	t_uint32		state[4];        /* state (ABCD) */
 	t_uint32 		count[2];        /* number of bits, modulo 2^64 (lsb first) */
-	unsigned char	buffer[64];                         /* input buffer */
+	unsigned char	buffer[64];      /* input buffer */
 } t_md5_ctx;
 
 typedef union	md5union

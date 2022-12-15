@@ -25,7 +25,7 @@ typedef struct {
 	t_uint8			buffer[64];
 	t_uint32		datalen;
 	t_uint64		bitlen;
-} t_sha256_ctx;
+} t_sha256_context;
 
 typedef union	shaunion_256
 {
@@ -33,7 +33,7 @@ typedef union	shaunion_256
 	t_uint8			byte[4];
 }				u_sha256;
 
-/* sha256 context */
+/* sha512 context */
 typedef struct sha512_ctx
 {
 	t_uint64	message[16];
@@ -83,8 +83,7 @@ t_uint32    up_sig1(t_uint32 x);
 t_uint32    low_sig0(t_uint32 x);
 t_uint32    low_sig1(t_uint32 x);
 
-/* init_sha256.c */
-void    sha256_init(t_sha256_ctx *ctx);
+/* sha256.c */
 char    *sha256(const char *msg, t_uint32 len);
 
 /* sha512.c */

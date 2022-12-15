@@ -12,7 +12,7 @@ typedef	unsigned long	t_uint64;
 # define le2me_64(x) bswap_64(x)
 
 # define be32_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))
-# define le32_copy(to, index, from, length) swap_str_to_u32((to), (index), (from), (length))
+# define le32_copy(to, index, from, length) swap_str_to_t_uint32((to), (index), (from), (length))
 # define be64_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))
 # define le64_copy(to, index, from, length) swap_str_to_u64((to), (index), (from), (length))
 # define me64_to_be_str(to, from, length) memcpy((to), (from), (length))
@@ -23,7 +23,7 @@ typedef	unsigned long	t_uint64;
 # define le2me_32(x) (x)
 # define le2me_64(x) (x)
 
-# define be32_copy(to, index, from, length) swap_str_to_u32((to), (index), (from), (length))
+# define be32_copy(to, index, from, length) swap_str_to_t_uint32((to), (index), (from), (length))
 # define le32_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))
 # define be64_copy(to, index, from, length) swap_str_to_u64((to), (index), (from), (length))
 # define le64_copy(to, index, from, length) memcpy((char*)(to) + (index), (from), (length))

@@ -1,6 +1,6 @@
 #include "ft_ssl.h"
 #include "ft_sha.h"
-            
+
 static t_uint32    ror32(t_uint32 v, t_uint16 n)
 {
     return (((v) >> (n)) | ((v) << (32-(n))));
@@ -13,7 +13,7 @@ t_uint32    ch(t_uint32 x, t_uint32 y, t_uint32 z)
 
 t_uint32    maj(t_uint32 x, t_uint32 y, t_uint32 z)
 {
-    return ((x & y) ^ (x & z) ^ (y & z)); 
+    return ((x & y) ^ (x & z) ^ (y & z));
 }
 
 t_uint32    up_sig0(t_uint32 x)

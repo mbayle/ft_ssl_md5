@@ -1,6 +1,13 @@
 #include "ft_ssl.h"
 #include "ft_md5.h"
 
+/*! \fn static void	md5_pad_msg(t_uint8 *msg, t_uint32 len, t_uint32 total_len)
+ *  \brief Padding gestion
+ *
+ *  @param[in] [msg] result
+ *  @param[in] [len] size
+ *  @param[in] [total_len] size of result
+ */
 static void	md5_pad_msg(t_uint8 *msg, t_uint32 len, t_uint32 total_len)
 {
 	int		q;
@@ -16,6 +23,12 @@ static void	md5_pad_msg(t_uint8 *msg, t_uint32 len, t_uint32 total_len)
 		ft_memcpy(msg + q, &u.word, 4);
 }
 
+/*! \fn t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
+ *  \brief Implementation of md5 algorithm
+ *
+ *  @param[in] [msg] Message to hash
+ *  @param[in] [len] Size of block
+ */
 t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 {
 	static t_uint32     total_len = 0;
@@ -95,6 +108,12 @@ t_uint32	*hash_msg_md5(const char *msg, t_uint32 len)
 	return context_states;
 }
 
+/*! \fn void    block_to_str(char *str, u_md5 block)
+ *  \brief Transform result block (hexadecimal) to string
+ *
+ *  @param[in] [str] Message to hash
+ *  @param[in] [block] Size of block
+ */
 void    block_to_str(char *str, u_md5 block)
 {
 	t_uint8     i;
@@ -121,6 +140,12 @@ void    block_to_str(char *str, u_md5 block)
 	str[8] = '\0';
 }
 
+/*! \fn char    *md5(const char *msg, t_uint32 len)
+ *  \brief MD5 Core (hash msg and transform result into string)
+ *
+ *  @param[in] [msg] Message to hash
+ *  @param[in] [len] Size of block
+ */
 char	*md5(const char *msg, t_uint32 len)
 {
 	u_md5		block;

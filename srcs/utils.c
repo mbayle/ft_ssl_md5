@@ -68,7 +68,21 @@ size_t		ft_strlen(const char *s)
 	size_t i;
 
 	i = 0;
+	if(!s)
+		return (0);
 	while (s[i] != '\0')
 		i++;
 	return (i);
+}
+
+void	*ft_memset(void *b, int c, size_t len)
+{
+	int				i;
+	unsigned char	*b1;
+
+	i = 0;
+	b1 = (unsigned char *)b;
+	while (len-- > 0)
+		b1[i++] = c;
+	return ((void *)b1);
 }

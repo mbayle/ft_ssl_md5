@@ -1,39 +1,39 @@
-#ifndef FT_WHIRLPOOL_H
-# define FT_WHIRLPOOL_H
-# include <stddef.h>
+/* whirlpool.h */
+#ifndef WHIRLPOOL_H
+#define WHIRLPOOL_H
 
+#include <stdlib.h>
+
+#define whirlpool_block_size 64
 typedef unsigned char	t_uint8;
 typedef unsigned short	t_uint16;
 typedef unsigned int	t_uint32;
 typedef unsigned long	t_uint64;
 
-#define BLOCK_SIZE			64
-#define I64(x)				x##ULL
-#define IS_ALIGNED_64(p)	(0 == (7 & ((const char*)(p) - (const char*)0)))
+#define I64(x)	x##ULL
 
-#define WHIRLPOOL_OP(src, shift) ( \
-		g_whirlpool_sbox[0][(int)(src[ shift      & 7] >> 56)       ] ^ \
-		g_whirlpool_sbox[1][(int)(src[(shift + 7) & 7] >> 48) & 0xff] ^ \
-		g_whirlpool_sbox[2][(int)(src[(shift + 6) & 7] >> 40) & 0xff] ^ \
-		g_whirlpool_sbox[3][(int)(src[(shift + 5) & 7] >> 32) & 0xff] ^ \
-		g_whirlpool_sbox[4][(int)(src[(shift + 4) & 7] >> 24) & 0xff] ^ \
-		g_whirlpool_sbox[5][(int)(src[(shift + 3) & 7] >> 16) & 0xff] ^ \
-		g_whirlpool_sbox[6][(int)(src[(shift + 2) & 7] >>  8) & 0xff] ^ \
-		g_whirlpool_sbox[7][(int)(src[(shift + 1) & 7]      ) & 0xff])
-
-typedef union	whirlpool
-{
-	t_uint64	word;
-	t_uint8		byte[8];
-}				u_whirlpool;
-
+/* algorithm context */
 typedef struct whirlpool_ctx
 {
-	t_uint64		hash[8];
-	t_uint8			message[BLOCK_SIZE];
-	t_uint64		length;
-} t_whirlpool_ctx;
+	t_uint64 hash[8];    /* 512-bit algorithm internal hashing state */
+	unsigned char message[whirlpool_block_size]; /* 512-bit buffer to hash */
 
-char    	*whirlpool(const char *msg, t_uint32 len);
+	/* Note: original algorith uses 256-bit counter, allowing to hash up to
+	   2^256 bits sized message. For optimization we use here 64-bit counter,
+	   thus reducing maximal message size to 2^64 bits = 2 Exbibytes = 2^21 TiB) */
+	t_uint64 length;     /* number of processed bytes */
+} whirlpool_ctx;
 
-#endif
+typedef union	WHIRLPOOLunion
+{
+	t_uint64	result;
+	t_uint8		byte[8];
+}				WHIRLPOOLunion;
+
+/* hash functions */
+char *whirlpool(const char *msg, t_uint32 len);
+void whirlpool_init(whirlpool_ctx* ctx);
+void whirlpool_update(whirlpool_ctx* ctx, const unsigned char* msg, size_t size);
+void whirlpool_final(whirlpool_ctx* ctx, unsigned char* result);
+
+#endif /* WHIRLPOOL_H */

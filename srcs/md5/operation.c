@@ -28,4 +28,3 @@ t_uint32	rol32(t_uint32 v, t_uint16 n)
 	mask = (1 << n) - 1;
 	return ((v >> (32 - n)) & mask) | ((v << n) & ~mask);
 }
-

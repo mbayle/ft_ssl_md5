@@ -1,7 +1,6 @@
 #include "ft_ssl.h"
 #include "ft_md5.h"
 
-#include <math.h>
 static double	ft_pow(double n, t_uint32 pow)
 {
 	double	result;
@@ -88,7 +87,6 @@ t_uint32	*calctable_init(void)
 	pwr = ft_pow(2.0, 32);
 	while (i < 64)
 	{
-		//s = fabs(sin(1.0 + i));
 		k[i] = (t_uint32)(s[i] * pwr);
 		i++;
 	}

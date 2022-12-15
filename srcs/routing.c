@@ -87,9 +87,16 @@ static void			print_open_err(char *file)
 {
 	if (access(file, F_OK) < 0)
 	{
-		write(STDERR, "ft_ssl: Error: \'", 16);
-		write(STDERR, file, ft_strlen(file));
-		write(STDERR, "\' does not exist.\n", 18);
+        if (ft_strlen(file) == 0)
+        {
+            write(STDERR, "ft_ssl: Error: \'\': No such file or directory.\n", 46);
+            return ;
+        }
+        else{
+            write(STDERR, "ft_ssl: Error: \'", 16);
+            write(STDERR, file, ft_strlen(file));
+            write(STDERR, "\' does not exist.\n", 18);
+        }
 	}
 	else
 	{
@@ -124,15 +131,6 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
             return (ERR_NO_MEM);
         }
 	}
-	if (options.o == TRUE)
-	{
-		if ((out_fd = open(args[i], O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0)
-		{
-			print_open_err(args[i]);
-			return (ERR_OPEN);
-		}
-		i += 1;
-	}
     if (count == 0 || options.p == TRUE)
 	{
 		if (options.p == TRUE)
@@ -163,8 +161,6 @@ char                hash_message(const t_cipher cipher, t_opt options, char **ar
 		free(result);
         i++;
     }
-	if (options.o == TRUE)
-		close(out_fd);
     free(sizes_tab);
     free(func_tab);
     return (return_value);

@@ -20,7 +20,7 @@ static const unsigned k[64] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-void sha256_transform(t_sha256_ctx *ctx, const t_uint8 data[])
+void sha256_transform(t_sha256_context *context, const t_uint8 data[])
 {
 	t_uint32 a, b, c, d, e, f, g, h, i, j, t1, t2, m[64];
 
@@ -29,14 +29,14 @@ void sha256_transform(t_sha256_ctx *ctx, const t_uint8 data[])
 	for ( ; i < 64; ++i)
 		m[i] = low_sig1(m[i - 2]) + m[i - 7] + low_sig0(m[i - 15]) + m[i - 16];
 
-	a = ctx->state[0];
-	b = ctx->state[1];
-	c = ctx->state[2];
-	d = ctx->state[3];
-	e = ctx->state[4];
-	f = ctx->state[5];
-	g = ctx->state[6];
-	h = ctx->state[7];
+	a = context->state[0];
+	b = context->state[1];
+	c = context->state[2];
+	d = context->state[3];
+	e = context->state[4];
+	f = context->state[5];
+	g = context->state[6];
+	h = context->state[7];
 
 	for (i = 0; i < 64; ++i) {
 		t1 = h + up_sig1(e) + ch(e,f,g) + k[i] + m[i];
@@ -51,70 +51,70 @@ void sha256_transform(t_sha256_ctx *ctx, const t_uint8 data[])
 		a = t1 + t2;
 	}
 
-	ctx->state[0] += a;
-	ctx->state[1] += b;
-	ctx->state[2] += c;
-	ctx->state[3] += d;
-	ctx->state[4] += e;
-	ctx->state[5] += f;
-	ctx->state[6] += g;
-	ctx->state[7] += h;
+	context->state[0] += a;
+	context->state[1] += b;
+	context->state[2] += c;
+	context->state[3] += d;
+	context->state[4] += e;
+	context->state[5] += f;
+	context->state[6] += g;
+	context->state[7] += h;
 }
 
-void sha256_update(t_sha256_ctx *ctx, const t_uint8 data[], size_t len)
+void sha256_update(t_sha256_context *context, const t_uint8 data[], size_t len)
 {
 	t_uint32 i;
 
 	for (i = 0; i < len; ++i) {
-		ctx->buffer[ctx->datalen] = data[i];
-		ctx->datalen++;
-		if (ctx->datalen == 64) {
-			sha256_transform(ctx, ctx->buffer);
-			ctx->bitlen += 512;
-			ctx->datalen = 0;
+		context->buffer[context->datalen] = data[i];
+		context->datalen++;
+		if (context->datalen == 64) {
+			sha256_transform(context, context->buffer);
+			context->bitlen += 512;
+			context->datalen = 0;
 		}
 	}
 }
 
-void sha256_final(t_sha256_ctx *ctx, t_uint8 hash[])
+void sha256_final(t_sha256_context *context, t_uint8 hash[])
 {
 	t_uint32 i;
 
-	i = ctx->datalen;
+	i = context->datalen;
 
-	if (ctx->datalen < 56) {
-		ctx->buffer[i++] = 0x80;
+	if (context->datalen < 56) {
+		context->buffer[i++] = 0x80;
 		while (i < 56)
-			ctx->buffer[i++] = 0x00;
+			context->buffer[i++] = 0x00;
 	}
 	else {
-		ctx->buffer[i++] = 0x80;
+		context->buffer[i++] = 0x80;
 		while (i < 64)
-			ctx->buffer[i++] = 0x00;
-		sha256_transform(ctx, ctx->buffer);
-		ft_bzero(ctx->buffer, 56);
+			context->buffer[i++] = 0x00;
+		sha256_transform(context, context->buffer);
+		ft_bzero(context->buffer, 56);
 	}
 
-	ctx->bitlen += ctx->datalen * 8;
-	ctx->buffer[63] = ctx->bitlen;
-	ctx->buffer[62] = ctx->bitlen >> 8;
-	ctx->buffer[61] = ctx->bitlen >> 16;
-	ctx->buffer[60] = ctx->bitlen >> 24;
-	ctx->buffer[59] = ctx->bitlen >> 32;
-	ctx->buffer[58] = ctx->bitlen >> 40;
-	ctx->buffer[57] = ctx->bitlen >> 48;
-	ctx->buffer[56] = ctx->bitlen >> 56;
-	sha256_transform(ctx, ctx->buffer);
+	context->bitlen += context->datalen * 8;
+	context->buffer[63] = context->bitlen;
+	context->buffer[62] = context->bitlen >> 8;
+	context->buffer[61] = context->bitlen >> 16;
+	context->buffer[60] = context->bitlen >> 24;
+	context->buffer[59] = context->bitlen >> 32;
+	context->buffer[58] = context->bitlen >> 40;
+	context->buffer[57] = context->bitlen >> 48;
+	context->buffer[56] = context->bitlen >> 56;
+	sha256_transform(context, context->buffer);
 
 	for (i = 0; i < 4; ++i) {
-		hash[i]      = (ctx->state[0] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 4]  = (ctx->state[1] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 8]  = (ctx->state[2] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 12] = (ctx->state[3] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 16] = (ctx->state[4] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 20] = (ctx->state[5] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 24] = (ctx->state[6] >> (24 - i * 8)) & 0x000000ff;
-		hash[i + 28] = (ctx->state[7] >> (24 - i * 8)) & 0x000000ff;
+		hash[i]      = (context->state[0] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 4]  = (context->state[1] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 8]  = (context->state[2] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 12] = (context->state[3] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 16] = (context->state[4] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 20] = (context->state[5] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 24] = (context->state[6] >> (24 - i * 8)) & 0x000000ff;
+		hash[i + 28] = (context->state[7] >> (24 - i * 8)) & 0x000000ff;
 	}
 }
 
@@ -166,16 +166,30 @@ char	*generate_hash(t_uint8 *digest)
 	return (hash);
 }
 
+static void sha256_init(t_sha256_context *context)
+{
+	context->datalen = 0;
+	context->bitlen = 0;
+	context->state[0] = SHA256_STATE1;
+	context->state[1] = SHA256_STATE2;
+	context->state[2] = SHA256_STATE3;
+	context->state[3] = SHA256_STATE4;
+	context->state[4] = SHA256_STATE5;
+	context->state[5] = SHA256_STATE6;
+	context->state[6] = SHA256_STATE7;
+	context->state[7] = SHA256_STATE8;
+}
+
 char    *sha256(const char *msg, t_uint32 len)
 {
-    static t_sha256_ctx    *context = NULL;
+    static t_sha256_context    *context = NULL;
     t_uint8                digest[36];
     char                   *hash;
 
 	hash = NULL;
     if (context == NULL)
     {
-        if (!(context = malloc(sizeof(t_sha256_ctx))))
+        if (!(context = malloc(sizeof(t_sha256_context))))
             return (NULL);
 		sha256_init(context);
     }
